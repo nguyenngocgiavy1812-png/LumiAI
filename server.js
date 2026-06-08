@@ -1,993 +1,159 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>CGV Cinemas Vietnam - Official Clone Interface</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        /* CSS Bổ sung cho thanh tìm kiếm chuẩn CGV */
-        .cgv-search-bar-container {
-            width: 100%;
-            background: #f4f2ec;
-            border: 1px solid var(--border-color);
-            padding: 12px 20px;
-            box-sizing: border-box;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
+const express = require('express');
+const http = require('http');
+const WebSocket = require('ws');
+const path = require('path');
+const nodemailer = require('nodemailer'); // Khai báo thư viện gửi mail
+
+const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// CẤU HÌNH TRẠM GỬI MAIL TỰ ĐỘNG (Sử dụng Gmail SMTP cá nhân)
+// Bạn cần vào tài khoản Google -> Security -> 2-Step Verification -> App Passwords để sinh mật khẩu 16 ký tự
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'hoang2026@gmail.com', // Thay bằng Email hệ thống rạp của bạn
+        pass: '1'  // Thay bằng Mật khẩu ứng dụng (App Password) 16 ký tự
+    }
+});
+
+// KHO DỮ LIỆU PHIM ĐỒNG BỘ FRONTEND
+const movies = [
+    { id: 1, title: "MA XÓ", genre: "Kinh Dị", status: "now_showing" },
+    { id: 2, title: "Phim Điện Ảnh Doraemon: Nobita và Lâu Đài Dưới Đáy Biển (Phiên bản mới)", genre: "Hoạt Hình, Phiêu Lưu", status: "now_showing" },
+    { id: 3, title: "TÊN CẬU LÀ GÌ.", genre: "Hoạt Hình", status: "now_showing" },
+    { id: 4, title: "HE-MAN VÀ NHỮNG CHIẾN BINH VŨ TRỤ", genre: "Hành Động, Khoa Học Viễn Tưởng", status: "now_showing" },
+    { id: 5, title: "Avengers: Secret Wars", genre: "Siêu Anh Hùng", status: "coming_soon" }
+];
+
+const showtimes = ["14:30", "17:15", "19:45"];
+let masterSeatStore = {};
+
+function initSeatMap() {
+    const ROWS = ['A', 'B', 'C', 'D'];
+    let seatMap = {};
+    for (let r of ROWS) {
+        for (let c = 1; c <= 6; c++) {
+            seatMap[`${r}${c}`] = { status: 'available', expiresAt: null };
         }
-        .search-title-lbl { font-size: 14px; font-weight: bold; color: #333; text-transform: uppercase; }
-        .cgv-search-input {
-            flex-grow: 1;
-            padding: 8px 15px;
-            border: 1px solid #777;
-            font-size: 13px;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-    </style>
-</head>
-<body>
+    }
+    return seatMap;
+}
 
-    <!-- UTILITY TOP BAR -->
-    <div class="cgv-top-utility-wrapper">
-        <div class="cgv-top-banner-promo">
-            <div style="width: 1100px; margin: 0 auto; position: relative;">
-                <img src="https://www.cgv.vn/media/banner/images/v/n/vnpay_cgv_1100x80.jpg" alt="Promo Banner" style="width: 100%; height: 80px; display: block;">
-            </div>
-        </div>
+movies.forEach(m => {
+    if (m.status === "now_showing") {
+        masterSeatStore[m.title] = {};
+        showtimes.forEach(t => {
+            masterSeatStore[m.title][t] = initSeatMap();
+        });
+    }
+});
 
-        <div class="cgv-top-sub-nav">
-            <div class="sub-nav-container">
-                <div class="sub-nav-links-right">
-                    <a href="#" class="sub-nav-item" onclick="switchCgvTab('panel-news')">
-                        <span class="sub-nav-icon">🎫</span> TIN MỚI & ƯU ĐÃI
-                    </a>
-                    <a href="#" class="sub-nav-item" id="top-bar-ticket-link" onclick="handleTicketViewAccess()">
-                        <span class="sub-nav-icon">🎬</span> VÉ CỦA TÔI
-                    </a>
-                    <a href="#" class="sub-nav-item" id="top-bar-auth-link" onclick="openAuthModal()">
-                        <span class="sub-nav-icon">👤</span> ĐĂNG NHẬP/ ĐĂNG KÝ
-                    </a>
-                    <div class="lang-selector-box">
-                        <span class="lang-btn lang-vn">VN</span>
-                        <span class="lang-btn lang-en">EN</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+function broadcast(type, data) {
+    const message = JSON.stringify({ type, data });
+    wss.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) client.send(message);
+    });
+}
 
-    <!-- MAIN HEADER -->
-    <header>
-        <div class="header-container">
-            <div class="logo" onclick="switchCgvTab('panel-movies', 'now_showing')">CGV<span>CINEMAS</span></div>
-            <div class="nav-menu">
-                <div class="nav-item-wrapper">
-                    <a href="#" class="nav-link active" id="lnk-movies" onclick="switchCgvTab('panel-movies', 'now_showing')">Phim</a>
-                    <div class="dropdown-menu">
-                        <a href="#" class="dropdown-item" onclick="switchCgvTab('panel-movies', 'now_showing')">Phim Đang Chiếu</a>
-                        <a href="#" class="dropdown-item" onclick="switchCgvTab('panel-movies', 'coming_soon')">Phim Sắp Chiếu</a>
-                    </div>
-                </div>
-                
-                <div class="nav-item-wrapper">
-                    <a href="#" class="nav-link" id="lnk-booking" onclick="switchCgvTab('panel-booking')">Rạp CGV</a>
-                </div>
+// Tự động quét giải phóng ghế giữ sau 5 phút
+setInterval(() => {
+    let hasChanges = false;
+    const now = Date.now();
+    Object.keys(masterSeatStore).forEach(movie => {
+        Object.keys(masterSeatStore[movie]).forEach(time => {
+            let seats = masterSeatStore[movie][time];
+            Object.keys(seats).forEach(id => {
+                if (seats[id].status === 'holding' && seats[id].expiresAt < now) {
+                    seats[id] = { status: 'available', expiresAt: null };
+                    hasChanges = true;
+                }
+            });
+        });
+    });
+    if (hasChanges) {
+        broadcast('SYNC_DATA', { masterSeatStore, movies, showtimes });
+    }
+}, 2000);
 
-                <div class="nav-item-wrapper">
-                    <a href="#" class="nav-link" id="lnk-profile" onclick="handleProfileTabAccess()">Thành Viên</a>
-                    <div class="dropdown-menu">
-                        <a href="#" class="dropdown-item" onclick="openAuthModal()">Tài Khoản CGV</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="cgv-red-line"></div>
-    </header>
+wss.on('connection', (ws) => {
+    ws.send(JSON.stringify({ type: 'SYNC_DATA', data: { masterSeatStore, movies, showtimes } }));
+});
 
-    <div class="main-wrapper">
-        
-        <!-- PANEL 1: DANH SÁCH PHIM TRANG CHỦ -->
-        <div id="panel-movies" class="cgv-panel active">
-            <div class="cgv-breadcrumb-bar" style="display: flex; align-items: center; gap: 5px;">
-                <span class="bc-link" onclick="handleBreadcrumbBack()" style="cursor: pointer; font-weight: bold; color: #e71a0f; margin-right: 10px; display: none;" id="bc-back-btn">⬅ Trở lại</span>
-                <span class="bc-link" onclick="goHomeFromBc()" style="cursor: pointer;">🏠</span> &gt; 
-                <span id="bc-parent-text">Phim</span> &gt; 
-                <span class="current-bc" id="bc-current-text">Phim Đang Chiếu</span>
-            </div>
+// API 1: Giữ ghế tạm thời
+app.post('/api/seats/hold', (req, res) => {
+    const { movie, showtime, seats } = req.body;
+    const currentSeats = masterSeatStore[movie]?.[showtime];
 
-            <div class="cgv-movie-tab-header">
-                <h1 class="tab-title-main" id="tab-title-now" onclick="switchMovieFilterTab('now_showing')">Phim Đang Chiếu</h1>
-                <span class="tab-title-sub" id="tab-title-coming" onclick="switchMovieFilterTab('coming_soon')">PHIM SẮP CHIẾU</span>
-            </div>
+    if (!currentSeats) return res.status(400).json({ success: false, message: "Suất chiếu không tồn tại!" });
 
-            <!-- 🛠️ THÊM CHỨC NĂNG TÌM KIẾM PHIM VÀ BỘ LỌC CỦA BẠN TẠI ĐÂY -->
-            <div class="cgv-search-bar-container">
-                <span class="search-title-lbl">Tìm Kiếm Phim Nhanh:</span>
-                <input type="text" id="movie-search-input" class="cgv-search-input" placeholder="Nhập tên phim hoặc thể loại bạn muốn tìm kiếm..." oninput="executeMovieRealTimeSearch()">
-            </div>
-            
-            <div class="cgv-movie-grid-spec" id="cgv-movie-list"></div>
-        </div>
+    const isConflict = seats.some(id => currentSeats[id] && currentSeats[id].status !== 'available');
+    if (isConflict) return res.status(400).json({ success: false, message: "Ghế đã bị giữ hoặc đã bán!" });
 
-        <!-- PANEL 2: CHI TIẾT PHIM -->
-        <div id="panel-movie-detail" class="cgv-panel">
-            <div class="section-title">Chi Tiết Phim Sinh Động</div>
-            <div class="movie-detail-container" style="display: flex; gap: 30px; text-align: left;">
-                <div style="width: 240px; height: 340px; background: #222; color: #e5a93b; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 4px;">🎬 LARGE POSTER</div>
-                <div class="movie-detail-info" style="flex: 1;">
-                    <h2 id="detail-movie-title" style="margin: 0 0 15px 0; color: #e71a0f; font-size: 24px; font-weight: bold;">-</h2>
-                    <p style="margin: 8px 0; font-size: 14px;"><strong>Thể loại: </strong><span id="detail-movie-genre" style="color:#0066cc; font-weight: bold;">-</span></p>
-                    <p style="margin: 8px 0; font-size: 14px;"><strong>Thời lượng: </strong> 135 phút (2 tiếng 15 phút)</p>
-                    <p style="margin: 8px 0; font-size: 14px;"><strong>Định dạng phòng: </strong> 2D l 3D l IMAX l GOLD CLASS</p>
-                    <p style="margin: 8px 0; font-size: 14px;"><strong>Đạo diễn: </strong> Christopher Nolan l <strong>Diễn viên: </strong> Hollywood Stars</p>
-                    <p style="margin: 20px 0 8px 0; font-weight: bold; font-size: 15px; color: #111;">Tóm tắt nội dung phim:</p>
-                    <p style="color: #555; line-height: 1.6; text-align: justify; font-size: 13.5px; margin: 0;">Chào mừng bạn đến với chuyên trang tóm tắt nội dung siêu phẩm điện ảnh đỉnh cao đang khởi chiếu tại cụm rạp CGV Cinemas Vietnam. Tác phẩm hứa đem đến những trải nghiệm bùng nổ cảm xúc kỹ xảo hoành tráng cùng cốt truyện thăng hoa cho người hâm mộ.</p>
-                    <button id="btn-detail-book-now" style="background: #e71a0f; color: white; border: none; padding: 12px 40px; font-size: 15px; font-weight: bold; margin-top: 25px; cursor: pointer; border-radius: 4px; box-shadow: 0 4px 6px rgba(231,26,15,0.3);">MUA VÉ NGAY</button>
-                </div>
-            </div>
-        </div>
+    const expiresAt = Date.now() + 5 * 60 * 1000;
+    seats.forEach(id => { currentSeats[id] = { status: 'holding', expiresAt }; });
 
-        <!-- PANEL 3: QUY TRÌNH ĐẶT VÉ -->
-        <div id="panel-booking" class="cgv-panel">
-            <div class="section-title">Mua Vé Nhanh Trực Tuyến</div>
-            
-            <div class="cgv-date-selector-wrapper">
-                <div class="cgv-date-slider-container" id="cgv-dynamic-date-slider">
-                    </div>
-            </div>
+    broadcast('SYNC_DATA', { masterSeatStore, movies, showtimes });
+    res.json({ success: true, expiresAt });
+});
 
-            <div class="booking-selector" style="margin-top: 20px;">
-                <div class="select-box-wrapper">
-                    <h3>1. Chọn Phim Trực Thuộc</h3>
-                    <select id="cgv-combo-movie" onchange="onMovieOrTimeChange()"></select>
-                </div>
-                <div class="select-box-wrapper">
-                    <h3>2. Chọn Suất Chiếu</h3>
-                    <div class="showtime-grid" id="cgv-showtime-grid"></div>
-                </div>
-            </div>
+// API 2: Thanh toán & Gửi mail hóa đơn thực tế
+app.post('/api/seats/checkout', (req, res) => {
+    const { movie, showtime, seats, email } = req.body; // Lấy thêm Email người nhận từ Frontend truyền lên
+    const currentSeats = masterSeatStore[movie]?.[showtime];
 
-            <div class="countdown-timer" id="hold-timer">
-                ⚠️ Ghế của bạn đang được giữ tạm thời. Vui lòng hoàn tất thanh toán trong: <span id="timer-string">05:00</span>
-            </div>
+    if (!currentSeats) return res.status(400).json({ success: false });
 
-            <div class="section-title">3. Chọn Ghế Ngồi Phòng Chiếu</div>
-            <div class="cinema-room">
-                <div class="screen-curve"></div>
-                <div class="screen-text">Màn Hình (Screen)</div>
-                <div class="seat-grid" id="cgv-seat-grid"></div>
-                
-                <div class="seat-legend">
-                    <div class="legend-item"><div class="legend-box" style="background:#666;"></div> Thường (90k)</div>
-                    <div class="legend-item"><div class="legend-box" style="background:#b31010;"></div> VIP (110k)</div>
-                    <div class="legend-item"><div class="legend-box" style="background:#e25b8b;"></div> Sweetbox Ghế Đôi (250k)</div>
-                    <div class="legend-item"><div class="legend-box" style="background:var(--cgv-gold);"></div> Người khác giữ</div>
-                    <div class="legend-item"><div class="legend-box" style="background:var(--cgv-red);"></div> Ghế bạn chọn</div>
-                </div>
-            </div>
-
-            <div class="section-title">4. Chọn Tiện Ích Combo Bắp Nước</div>
-            <div class="fnb-container">
-                <div class="fnb-item">
-                    <div class="fnb-img">🍿</div>
-                    <div class="fnb-details">
-                        <div class="fnb-title">CGV Combo Thần Thánh</div>
-                        <div class="fnb-price">85,000 đ</div>
-                    </div>
-                    <div class="qty-counter">
-                        <button class="qty-btn" onclick="updateFnbQty(-1)">-</button>
-                        <span id="fnb-qty" style="font-weight:bold;">0</span>
-                        <button class="qty-btn" onclick="updateFnbQty(1)">+</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- PANEL 4: TIN MỚI & ƯU ĐÃI -->
-        <div id="panel-news" class="cgv-panel">
-            <div class="section-title" style="justify-content: center; font-size: 22px; letter-spacing: 2px;">— TIN MỚI VÀ ƯU ĐÃI —</div>
-            <div class="news-filter-header-bar">
-                <button class="news-filter-btn active">Xem tất cả</button>
-                <button class="news-filter-btn">Chọn Rạp</button>
-            </div>
-            
-            <div class="news-grid-layout">
-                <div class="news-promo-card">
-                    <div class="news-card-img-holder" style="background-image: url('https://www.cgv.vn/media/catalog/product/cache/1/image/1800x/71252117777b696995f019344547b749/p/h/phong_ve_uu_dai_240x350_1_.jpg'); background-size: cover;"></div>
-                    <div class="news-card-date">📅 05/06/2026 - 10/06/2026</div>
-                    <div class="news-card-title-text">Đeo Phone Chắc Tay - Nhận Quà Khủng Liền Tay</div>
-                </div>
-                <div class="news-promo-card">
-                    <div class="news-card-img-holder" style="background: #a1dbf1; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#0c6291; font-size: 14px;">DORAEMON KEYCHAIN</div>
-                    <div class="news-card-date">📅 06/06/2026 - 12/06/2026</div>
-                    <div class="news-card-title-text">Xem Phim Doraemon Nhận Ngay Móc Khóa Xinh Xắn</div>
-                </div>
-                <div class="news-promo-card">
-                    <div class="news-card-img-holder" style="background: #b5e2b5; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#184a18; font-size: 14px;">VEXERE VOUCHER 25%</div>
-                    <div class="news-card-date">📅 05/06/2026 - 22/07/2026</div>
-                    <div class="news-card-title-text">Đổi Điểm CGV Rewards Nhận Voucher Giảm 25% Vexere</div>
-                </div>
-                <div class="news-promo-card">
-                    <div class="news-card-img-holder" style="background: #f1b2b2; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#6b1212; font-size: 14px;">4 SẢN PHẨM KHÁC NHAU</div>
-                    <div class="news-card-date">📅 01/06/2026 - 31/08/2026</div>
-                    <div class="news-card-title-text">Đổi Quà Khủng Nhận Ngay Bộ Sưu Tập Bình Nước Cinema</div>
-                </div>
-                <div class="news-promo-card">
-                    <div class="news-card-img-holder" style="background: #f1ebc3; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#5c5211; font-size: 14px;">QUÀ SINH NHẬT T6</div>
-                    <div class="news-card-date">📅 Quà Sinh Nhật MIỄN PHÍ</div>
-                    <div class="news-card-title-text">Ưu Đãi Đặc Quyền Sinh Nhật Tháng 6 Dành Cho Thành Viên</div>
-                </div>
-                <div class="news-promo-card">
-                    <div class="news-card-img-holder" style="background: #c3cef1; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#13255c; font-size: 14px;">CGV MEMBER DAY</div>
-                    <div class="news-card-date">📅 30/05/2026 - 12/06/2026</div>
-                    <div class="news-card-title-text">CGV Member Day - Nhân Đôi Điểm Thưởng Vào Thứ Tư</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- PANEL 5: THÀNH VIÊN -->
-        <div id="panel-profile" class="cgv-panel">
-            <div class="cgv-profile-layout">
-                <div class="profile-arrow-sidebar">
-                    <h2 class="sidebar-main-title">TÀI KHOẢN CGV</h2>
-                    <div class="arrow-menu-list">
-                        <button class="arrow-btn active" id="pro-subtab-btn-chung" onclick="switchProfileSubTab('chung')">THÔNG TIN CHUNG</button>
-                        <button class="arrow-btn" id="pro-subtab-btn-chitiet" onclick="switchProfileSubTab('chitiet')">CHI TIẾT TÀI KHOẢN</button>
-                        <button class="arrow-btn" id="pro-subtab-btn-matma" onclick="switchProfileSubTab('matma')">CÀI MẶT MÃ THANH TOÁN</button>
-                        <button class="arrow-btn" id="pro-subtab-btn-the" onclick="switchProfileSubTab('the')">THẺ THÀNH VIÊN</button>
-                        <button class="arrow-btn" id="pro-subtab-btn-diem" onclick="switchProfileSubTab('diem')">ĐIỂM THƯỞNG</button>
-                        <button class="arrow-btn" id="pro-subtab-btn-lichsu" onclick="switchProfileSubTab('lichsu')">LỊCH SỬ GIAO DỊCH</button>
-                    </div>
-                </div>
-
-                <div class="profile-content-display">
-                    <div id="pro-panel-chung" class="profile-sub-content active">
-                        <div class="sub-content-header-title">THÔNG TIN CHUNG</div>
-                        <div class="profile-top-summary">
-                            <div class="summary-avatar-zone">
-                                <div class="avatar-placeholder-img" style="background-color: #e71a0f; color: white; font-size: 28px; font-weight: bold;">VY</div>
-                                <button class="btn-avatar-change">Thay đổi</button>
-                            </div>
-                            <div class="summary-barcode-zone">
-                                <p style="margin: 0 0 5px 0; font-size: 12px; font-weight: bold; color: #333; text-align: right;">Thẻ thành viên</p>
-                                <div class="mock-barcode-img">
-                                    <div class="line-bar"></div><div class="line-bar thick"></div><div class="line-bar"></div><div class="line-bar thick"></div><div class="line-bar"></div>
-                                    <span class="barcode-label">Barcode</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="welcome-text-line">
-                            <strong>Xin chào Gia Vy,</strong>
-                            <p>Với trang này, bạn sẽ quản lý được tất cả thông tin tài khoản của mình.</p>
-                        </div>
-
-                        <div class="cgv-membership-dashboard-table">
-                            <div class="dashboard-column info-col">
-                                <p><strong>Cấp Độ Thẻ</strong> <span class="member-star-icon">★</span> <span style="color:#0066cc; font-weight: 900;">MEMBER</span></p>
-                                <p><strong>Tổng Chi Tiêu</strong> <b>0 đ</b></p>
-                                <p><strong>Điểm CGV</strong> <b>0 P</b></p>
-                            </div>
-                            <div class="dashboard-column action-col">
-                                <span class="dash-box-label">Thẻ Thành Viên</span>
-                                <span class="dash-box-value">1</span>
-                                <button class="btn-dash-view" onclick="switchProfileSubTab('the')">Xem</button>
-                            </div>
-                        </div>
-
-                        <div class="account-details-section">
-                            <div class="details-section-title" style="font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Thông tin tài khoản</div>
-                            <div class="details-sub-row" style="margin-top: 10px;">
-                                <span style="font-size: 14px; letter-spacing: 0.5px;">LIÊN HỆ</span>
-                                <button class="btn-avatar-change" style="margin: 0;" onclick="activateEditableFormFields()">Thay đổi</button>
-                            </div>
-                            
-                            <div class="profile-input-forms-grid">
-                                <div class="profile-input-group"><label>Họ và tên</label><input type="text" id="profile-field-name" class="profile-readonly-input" value="Nguyễn Ngọc Gia Vy" readonly></div>
-                                <div class="profile-input-group"><label>Số điện thoại</label><input type="text" id="profile-field-phone" class="profile-readonly-input" value="0348340006" readonly></div>
-                                <div class="profile-input-group"><label>Địa chỉ Email</label><input type="text" id="profile-field-email" class="profile-readonly-input" value="nguyenngocgiavy1812@gmail.com" readonly></div>
-                                <div class="profile-input-group"><label>Ngày sinh</label><input type="text" id="profile-field-birth" class="profile-readonly-input" value="18/12/2006" readonly></div>
-                                <div class="profile-input-group" style="grid-column: span 2;"><label>Giới tính</label><input type="text" id="profile-field-gender" class="profile-readonly-input" value="Nữ" readonly></div>
-                            </div>
-                            <button class="btn-save-profile-data-action" id="btn-save-profile" style="display: none;" onclick="saveUpdatedProfileInformationData()">LƯU THÔNG TIN KHÁCH HÀNG</button>
-                        </div>
-                    </div>
-
-                    <div id="pro-panel-chitiet" class="profile-sub-content"><div class="sub-content-header-title">CHI TIẾT TÀI KHOẢN</div><p style="padding: 20px; color:#666;">Cấu hình dữ liệu hồ sơ nâng cao.</p></div>
-                    <div id="pro-panel-matma" class="profile-sub-content"><div class="sub-content-header-title">CÀI MẶT MÃ THANH TOÁN</div><p style="padding: 20px; color:#666;">Thiết lập mã PIN giao dịch bảo mật.</p></div>
-                    <div id="pro-panel-the" class="profile-sub-content"><div class="sub-content-header-title">THẺ THÀNH VIÊN CARD</div><p style="padding: 20px; color:#666;">Mã thẻ cứng vật lý định danh thành viên.</p></div>
-                    <div id="pro-panel-diem" class="profile-sub-content"><div class="sub-content-header-title">ĐIỂM THƯỞNG TÍCH LŨY</div><p style="padding: 20px; color:#666;">Số điểm CGV point đang tích lũy.</p></div>
-                    <div id="pro-panel-lichsu" class="profile-sub-content">
-                        <div class="sub-content-header-title">LỊCH SỬ GIAO DỊCH VÉ</div>
-                        <div id="cgv-invoice-zone" style="padding: 15px;"><p style="color:#777; font-size: 13px;">Bạn chưa thực hiện giao dịch mua vé trực tuyến nào gần đây.</p></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- POPUP MODAL ĐĂNG NHẬP / ĐĂNG KÝ -->
-    <div class="cgv-modal-overlay" id="auth-modal">
-        <div class="cgv-auth-split-box">
-            <div class="cgv-modal-close" onclick="closeAuthModal()">✕</div>
-            <div class="auth-left-form">
-                <div class="cgv-auth-tabs">
-                    <button class="cgv-tab-btn active" id="tab-login-btn" onclick="toggleAuthTab('login')">Đăng Nhập</button>
-                    <button class="cgv-tab-btn" id="tab-register-btn" onclick="toggleAuthTab('register')">Đăng Ký</button>
-                </div>
-                
-                <!-- Form Đăng nhập -->
-                <div class="cgv-auth-content auth-form-panel active" id="form-login-panel">
-                    <div class="cgv-form-group">
-                        <label>Email hoặc số điện thoại</label>
-                        <input type="text" id="auth-username" class="cgv-input-text" placeholder="Email hoặc số điện thoại">
-                    </div>
-                    <div class="cgv-form-group">
-                        <label>Mật khẩu</label>
-                        <input type="password" id="auth-password" class="cgv-input-text" placeholder="Mật khẩu">
-                    </div>
-                    <div class="cgv-form-group">
-                        <label>Vui lòng nhập ký tự bên dưới <span style="color:var(--cgv-red)">*</span></label>
-                        <div class="captcha-row">
-                            <input type="text" class="cgv-input-text captcha-input" id="login-captcha" placeholder="Nhập ký tự">
-                            <div class="captcha-img-box">
-                                <span class="captcha-text" id="login-captcha-text">9W6X9N</span>
-                                <div class="captcha-refresh" onclick="generateNewLoginCaptcha()">↻</div>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn-cgv-submit" onclick="submitCgvLogin()">Đăng Nhập</button>
-                    <div class="cgv-auth-footer">
-                        <a href="#" onclick="openForgotModal()">Bạn muốn tìm lại mật khẩu?</a>
-                    </div>
-                </div>
-
-                <!-- Form Đăng ký -->
-                <div class="cgv-auth-content auth-form-panel" id="form-register-panel">
-                    <div class="scrollable-register-form">
-                        <div class="cgv-form-group"><label>Tên<span style="color:var(--cgv-red)">*</span></label><input type="text" id="reg-name" class="cgv-input-text" placeholder="Tên"></div>
-                        <div class="cgv-form-group"><label>Số điện thoại<span style="color:var(--cgv-red)">*</span></label><input type="text" id="reg-phone" class="cgv-input-text" placeholder="Số điện thoại"></div>
-                        <div class="cgv-form-group"><label>Email<span style="color:var(--cgv-red)">*</span></label><input type="email" id="reg-email" class="cgv-input-text" placeholder="Email"></div>
-                        <div class="cgv-form-group">
-                            <label>Mật khẩu<span style="color:var(--cgv-red)">*</span></label>
-                            <div style="position: relative;"><input type="password" id="reg-password" class="cgv-input-text" placeholder="Mật khẩu"><span class="toggle-password-icon" onclick="toggleRegPasswordState()">👁️</span></div>
-                        </div>
-                        <div class="cgv-form-group">
-                            <label>Ngày sinh<span style="color:var(--cgv-red)">*</span></label>
-                            <div class="birth-gender-row">
-                                <select class="select-birth" id="reg-birth-day"><option value="">Ngày</option></select>
-                                <select class="select-birth" id="reg-birth-month"><option value="">Tháng</option></select>
-                                <select class="select-birth" id="reg-birth-year"><option value="">Năm</option></select>
-                                <span style="margin: 0 5px; color:#333;">*</span>
-                                <label class="radio-lbl"><input type="radio" name="gender" value="Nam"> Nam</label>
-                                <label class="radio-lbl"><input type="radio" name="gender" value="Nữ" checked> Nữ</label>
-                            </div>
-                        </div>
-                        <div class="cgv-form-group">
-                            <label>Vui lòng nhập ký tự bên dưới <span style="color:var(--cgv-red)">*</span></label>
-                            <div class="captcha-row">
-                                <input type="text" id="reg-captcha" class="cgv-input-text captcha-input" placeholder="Nhập ký tự">
-                                <div class="captcha-img-box"><span class="captcha-text" id="reg-captcha-text">A2C2Y0</span><div class="captcha-refresh" onclick="generateNewRegisterCaptcha()">↻</div></div>
-                            </div>
-                        </div>
-                        <div class="policy-checkboxes">
-                            <label class="check-item"><input type="checkbox" class="reg-policy"> <span>Đồng ý Chính Sách Bảo Mật.</span></label>
-                            <label class="check-item"><input type="checkbox" class="reg-policy"> <span>Xác nhận thông tin hồ sơ CMND chính xác.</span></label>
-                            <label class="check-item"><input type="checkbox" class="reg-policy"> <span>Xác nhận khớp Email và Ngày sinh.</span></label>
-                            <label class="check-item"><input type="checkbox" class="reg-policy"> <span>Đồng ý Điều Khoản Sử Dụng.</span></label>
-                        </div>
-                        <button class="btn-cgv-submit" style="margin-top: 15px;" onclick="submitCgvRegister()">Đăng Ký</button>
-                    </div>
-                </div>
-            </div>
-<div class="cgv-modal-overlay" id="forgot-modal">
-        <div class="cgv-forgot-box">
-            <div class="cgv-forgot-header">Bạn muốn tìm lại mật khẩu?</div>
-            <div class="cgv-forgot-body">
-                <div class="cgv-form-group">
-                    <label>Email hoặc số điện thoại <span>*</span></label>
-                    <input type="text" id="forgot-email-input" class="cgv-input-text" style="border: 1px solid #000;" placeholder="Email hoặc số điện thoại">
-                </div>
-                
-                <div class="cgv-form-group" style="margin-top: 20px;">
-                    <label>Vui lòng nhập ký tự bên dưới <span>*</span></label>
-                    <div class="captcha-row">
-                        <input type="text" id="forgot-captcha-input" class="cgv-input-text cgv-forgot-captcha-box" style="width: 180px;" placeholder="Nhập ký tự">
-                        <div class="captcha-img-box" style="flex-grow: 1; justify-content: space-between;">
-                            <span class="captcha-text" id="forgot-captcha-text" style="letter-spacing: 3px; font-style: italic;">6IYQVX</span>
-                            <div class="captcha-refresh" onclick="generateForgotCaptcha()">↻</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Nút gửi kèm đồng hồ đếm ngược (4 giây) chuẩn cấu trúc -->
-                <button class="btn-cgv-forgot-submit" id="btn-forgot-submit-action" onclick="executeForgotRequestSubmit()">GỬI (4)</button>
-                
-                <div>
-                    <a href="#" class="cgv-forgot-back-link" onclick="closeForgotModal()">&laquo; Quay lại trang đăng nhập</a>
-                </div>
-            </div>
-        </div>
-    </div>
-            <div class="auth-right-banner">
-                <div class="slider-arrow arrow-left">‹</div>
-                <div class="banner-slide-content">
-                    <div class="banner-illustration"><div class="coin coin-main">★</div><div class="coin coin-sub1"></div><div class="coin coin-sub2"></div></div>
-                    <h3 class="banner-title">CHƯƠNG TRÌNH TÍCH ĐIỂM</h3>
-                    <p style="font-size:12px; color:#555; margin:0 0 15px 0;">1 điểm = 1.000 VND l tại rạp phim trên toàn quốc</p>
-                    <div class="dot-indicators"><span class="dot"></span><span class="dot active"></span><span class="dot"></span></div>
-                </div>
-                <div class="slider-arrow arrow-right">›</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- POPUP XÁC THỰC OTP -->
-    <div class="cgv-modal-overlay" id="otp-modal">
-        <div class="cgv-auth-split-box" style="width: 450px; flex-direction: column; padding: 25px; background: #fcf8ee; border-radius: 4px; border: 2px solid #222;">
-            <div class="cgv-modal-close" onclick="closeOtpModal()">✕</div>
-            <h3 style="text-align: center; color: #e71a0f; margin: 0 0 10px 0; font-weight: bold;">XÁC THỰC MÃ OTP</h3>
-            <p style="font-size: 13px; text-align: center; color: #555; line-height: 1.5;">Hệ thống bảo mật đã kích hoạt gửi mã OTP gồm 6 số. Vui lòng nhập để hoàn thành luồng đăng ký tài khoản thành viên.</p>
-            <div class="cgv-form-group" style="text-align: center; margin: 20px 0;">
-                <input type="text" id="otp-input-field" class="cgv-input-text" placeholder="Nhập mã số OTP gồm 6 chữ số" style="text-align: center; font-size: 16px; letter-spacing: 2px;">
-            </div>
-            <button class="btn-cgv-submit" onclick="submitOtpVerification()">XÁC NHẬN KÍCH HOẠT HỒ SƠ</button>
-        </div>
-    </div>
-
-    <!-- POPUP KHÔI PHỤC MẬT KHẨU -->
-    <div class="cgv-modal-overlay" id="forgot-modal">
-        <div class="cgv-auth-split-box" style="width: 450px; flex-direction: column; padding: 25px; background: #fcf8ee; border-radius: 4px; border: 2px solid #222;">
-            <div class="cgv-modal-close" onclick="closeForgotModal()">✕</div>
-            <h3 style="text-align: center; color: #e71a0f; margin: 0 0 15px 0; font-weight: bold;">KHÔI PHỤC MẬT KHẨU</h3>
-            <div class="cgv-form-group">
-                <label>Vui lòng điền Email hoặc Số điện thoại đã liên kết tài khoản</label>
-                <input type="text" id="forgot-email-input" class="cgv-input-text" placeholder="Nhập chính xác thông tin liên hệ">
-            </div>
-            <button class="btn-cgv-submit" onclick="submitForgotRequest()">GỬI YÊU CẦU ĐỔI MẬT KHẨU KHẨU NEW</button>
-        </div>
-    </div>
-
-    <!-- POPUP XÁC NHẬN ĐĂNG XUẤT -->
-    <div class="cgv-modal-overlay" id="logout-confirm-modal">
-        <div class="cgv-auth-split-box" style="width: 420px; flex-direction: column; padding: 25px; background: #fcf8ee; text-align: center; border: 2px solid #222; border-radius: 4px;">
-            <h3 style="color: #e71a0f; margin: 0 0 12px 0; font-weight: bold;">CẢNH BÁO ĐĂNG XUẤT</h3>
-            <p style="font-size: 14px; color: #333; margin-bottom: 25px; line-height: 1.4;">Người đẹp Vy có chắc chắn muốn đăng xuất thoát phiên làm việc an toàn này khỏi CGV Cinemas không?</p>
-            <div style="display: flex; gap: 15px;">
-                <button class="btn-cgv-submit" style="background: #777; margin: 0;" onclick="closeLogoutConfirmModal()">HỦY BỎ</button>
-                <button class="btn-cgv-submit" style="background: #e71a0f; margin: 0;" onclick="confirmCgvLogoutAction()">ĐỒNG Ý THOÁT</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- STICKY BOTTOM PAYMENT BAR -->
-    <div class="cgv-payment-bar" id="payment-sticky-bar" style="display:none;">
-        <div class="payment-container">
-            <div class="ticket-summary">
-                <div class="summary-block"><div class="summary-label">Phim</div><div class="summary-value" id="sum-movie-title">-</div></div>
-                <div class="summary-block"><div class="summary-label">Suất Chiếu</div><div class="summary-value" id="sum-showtime" style="color:var(--cgv-gold)">-</div></div>
-                <div class="summary-block"><div class="summary-label">Ghế</div><div class="summary-value" id="sum-seats" style="color:var(--cgv-gold)">Chưa chọn</div></div>
-                <div class="summary-block"><div class="summary-label">Bắp Nước</div><div class="summary-value" id="sum-fnb">0 Combo</div></div>
-                <div class="summary-block"><div class="summary-label">Tổng Tiền</div><div class="summary-value highlight" id="sum-total">0 đ</div></div>
-            </div>
-            <button class="btn-cgv-next" id="btn-main-action" onclick="handleMainAction()">Giữ Ghế Tạm Thời</button>
-        </div>
-    </div>
-
-<script>
-    let ws = new WebSocket('ws://127.0.0.1:3000');
-    let serverData = { masterSeatStore: {}, movies: [], showtimes: [] };
-    
-    let selectedSeats = [];
-    let selectedShowtime = "";
-    let currentMovieFilter = "now_showing";
-    let fnbQty = 0;
-    let currentPriceTotal = 0;
-    let isHoldingState = false;
-    let timerInterval = null;
-    let isUserLoggedInState = false;
-    let cgvNavigationHistory = ['panel-movies']; 
-    let activeSearchKeyword = ""; // Lưu từ khóa tìm kiếm phim thực tế
-
-    window.addEventListener('DOMContentLoaded', () => {
-        const daySelect = document.getElementById('reg-birth-day');
-        const monthSelect = document.getElementById('reg-birth-month');
-        const yearSelect = document.getElementById('reg-birth-year');
-        if (daySelect && monthSelect && yearSelect) {
-            for (let i = 1; i <= 31; i++) { daySelect.innerHTML += `<option value="${i}">${i}</option>`; }
-            for (let i = 1; i <= 12; i++) { monthSelect.innerHTML += `<option value="${i}">Tháng ${i}</option>`; }
-            for (let i = 2026; i >= 1950; i--) { yearSelect.innerHTML += `<option value="${i}">${i}</option>`; }
+    seats.forEach(id => {
+        if (currentSeats[id] && currentSeats[id].status === 'holding') {
+            currentSeats[id] = { status: 'sold', expiresAt: null };
         }
     });
 
-    function generateRandomCaptcha(length = 6) {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let result = '';
-        for (let i = 0; i < length; i++) { result += chars.charAt(Math.floor(Math.random() * chars.length)); }
-        return result;
-    }
-    function generateNewLoginCaptcha() { document.getElementById('login-captcha-text').innerText = generateRandomCaptcha(); }
-    function generateNewRegisterCaptcha() { document.getElementById('reg-captcha-text').innerText = generateRandomCaptcha(); }
+    const ticketId = 'CGV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${ticketId}`;
     
-    function toggleRegPasswordState() {
-        const passInput = document.getElementById('reg-password');
-        if(passInput) { passInput.type = (passInput.type === 'password') ? 'text' : 'password'; }
-    }
+    broadcast('SYNC_DATA', { masterSeatStore, movies, showtimes });
 
-    ws.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-        if (msg.type === 'SYNC_DATA') {
-            serverData = msg.data;
-            
-            const selectCombo = document.getElementById('cgv-combo-movie');
-            if(selectCombo && serverData.movies.length > 0) {
-                const currentVal = selectCombo.value;
-                selectCombo.innerHTML = '';
-                serverData.movies.forEach(m => {
-                    if(m.status === 'now_showing') {
-                        selectCombo.innerHTML += `<option value="${m.title}">${m.title}</option>`;
-                    }
-                });
-                if(currentVal && [...selectCombo.options].some(o => o.value === currentVal)) {
-                    selectCombo.value = currentVal;
-                }
-            }
+    // HÀM KÍCH HOẠT GỬI EMAIL THỰC TẾ
+    if (email) {
+        const mailOptions = {
+            from: '"CGV Cinemas Vietnam" <hoang2026@gmail.com>',
+            to: email, // Địa chỉ email của khách hàng nhập lúc đăng nhập/đặt vé
+            subject: `[CGV Cinemas] Xác nhận đặt vé thành công đơn hàng #${ticketId}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; border: 1px solid #ddd; padding: 20px; background-color: #fdfcf7;">
+                    <h2 style="color: #e71a0f; text-align: center;">CGV E-TICKET WALLET</h2>
+                    <p>Chào bạn,</p>
+                    <p>Hệ thống CGV Cinemas Vietnam xác nhận bạn đã thanh toán thành công đơn hàng đặt vé xem phim trực tuyến.</p>
+                    <hr style="border-color: #eee;">
+                    <p>🎬 <b>Bộ phim:</b> ${movie}</p>
+                    <p>🕒 <b>Suất chiếu:</b> ${showtime}</p>
+                    <p>💺 <b>Vị trí ghế ngồi:</b> ${seats.join(', ')}</p>
+                    <p>🎟️ <b>Mã đặt vé bí mật:</b> <span style="font-size: 18px; color: #e5a93b; font-weight: bold;">${ticketId}</span></p>
+                    <hr style="border-color: #eee;">
+                    <div style="text-align: center; margin-top: 15px;">
+                        <p style="font-size: 12px; color: #666;">Vui lòng đưa mã QR bên dưới cho nhân viên soát cửa rạp phim:</p>
+                        <img src="${qrCodeUrl}" alt="QR Code Vé">
+                    </div>
+                </div>
+            `
+        };
 
-            if(!selectedShowtime && serverData.showtimes.length > 0) {
-                selectedShowtime = serverData.showtimes[0];
-            }
-            renderCgvInterface();
-        }
-    };
-
-    function openAuthModal() { document.getElementById('auth-modal').classList.add('open'); generateNewLoginCaptcha(); generateNewRegisterCaptcha(); }
-    function closeAuthModal() { document.getElementById('auth-modal').classList.remove('open'); }
-
-    function toggleAuthTab(type) {
-        document.getElementById('tab-login-btn').classList.remove('active');
-        document.getElementById('tab-register-btn').classList.remove('active');
-        document.getElementById('form-login-panel').classList.remove('active');
-        document.getElementById('form-register-panel').classList.remove('active');
-        
-        if (type === 'login') {
-            document.getElementById('tab-login-btn').classList.add('active');
-            document.getElementById('form-login-panel').classList.add('active');
-        } else if (type === 'register') {
-            document.getElementById('tab-register-btn').classList.add('active');
-            document.getElementById('form-register-panel').classList.add('active');
-        }
-    }
-
-    function viewMovieDetailText(title, genre) {
-        document.getElementById('detail-movie-title').innerText = title;
-        document.getElementById('detail-movie-genre').innerText = genre;
-        document.getElementById('btn-detail-book-now').onclick = () => { quickBookMovie(title); };
-        switchCgvTab('panel-movie-detail');
-    }
-
-    // 🚀 HÀM PHẢN HỒI KHI GÕ CHỮ TRÊN THANH TÌM KIẾM PHIM REAL-TIME
-    function executeMovieRealTimeSearch() {
-        const inputField = document.getElementById('movie-search-input');
-        if (inputField) {
-            activeSearchKeyword = inputField.value.trim().toLowerCase();
-            renderCgvInterface(); // Ép hệ thống lọc chuỗi và vẽ lại phim
-        }
-    }
-// 🌟 BỔ SUNG 1: HÀM XỬ LÝ SỰ KIỆN CLICK CHỌN NGÀY TRÊN THANH NGANG
-    function selectCgvBookingDate(dateStr) {
-        selectedDateStr = dateStr;
-        generateCgvDateSlider(); // Vẽ lại thanh slider để đổi màu viền đen active
-        selectedSeats = [];      // Xóa ghế cũ của ngày cũ để tránh trùng lịch
-        renderCgvInterface();    // Ép cập nhật ma trận phòng chiếu
-    }
-
-    // 🌟 BỔ SUNG 2: ÉP HỆ THỐNG MỒI DỮ LIỆU NGAY KHI TRANG WEB VỪA KHỞI CHẠY (F5)
-    window.addEventListener('DOMContentLoaded', () => {
-        // Tự động kích hoạt luồng sinh thanh ngày ngang lập tức
-        generateCgvDateSlider(); 
-    });
-    function openOtpModal() { document.getElementById('otp-modal').classList.add('open'); }
-    function closeOtpModal() { document.getElementById('otp-modal').classList.remove('open'); }
-    function submitOtpVerification() {
-        const otpVal = document.getElementById('otp-input-field').value.trim();
-        if (otpVal.length !== 6 || isNaN(otpVal)) return alert("Mã xác thực OTP không đúng định dạng!");
-        alert("Kích hoạt tài khoản thành công! Mời bạn đăng nhập.");
-        closeOtpModal(); openAuthModal(); toggleAuthTab('login');
-    }
-
-    function openForgotModal() { closeAuthModal(); document.getElementById('forgot-modal').classList.add('open'); }
-    function closeForgotModal() { document.getElementById('forgot-modal').classList.remove('open'); openAuthModal(); }
-    function submitForgotRequest() {
-        const input = document.getElementById('forgot-email-input').value.trim();
-        if(!input) return alert("Vui lòng điền thông tin!");
-        alert(`Mã thiết lập liên kết đã được gửi tới: ${input}`);
-        closeForgotModal();
-    }
-
-    function handleCgvLogout(e) {
-        e.stopPropagation();
-        document.getElementById('logout-confirm-modal').classList.add('open');
-    }
-    function closeLogoutConfirmModal() { document.getElementById('logout-confirm-modal').classList.remove('open'); }
-    function confirmCgvLogoutAction() {
-        isUserLoggedInState = false;
-        closeLogoutConfirmModal();
-        const authLinkBox = document.getElementById('top-bar-auth-link');
-        authLinkBox.removeAttribute('style');
-        authLinkBox.onclick = openAuthModal;
-        authLinkBox.innerHTML = `<span class="sub-nav-icon">👤</span> ĐĂNG NHẬP/ ĐĂNG KÝ`;
-        document.getElementById('top-bar-ticket-link').innerHTML = `<span class="sub-nav-icon">🎬</span> VÉ CỦA TÔI`;
-        switchCgvTab('panel-movies', 'now_showing');
-    }
-
-    function handleTicketViewAccess() {
-        if (!isUserLoggedInState) { alert("Vui lòng đăng nhập hệ thống!"); openAuthModal(); } 
-        else { switchCgvTab('panel-profile'); switchProfileSubTab('lichsu'); }
-    }
-
-    function handleProfileTabAccess() {
-        if (!isUserLoggedInState) { alert("Vui lòng đăng nhập hệ thống!"); openAuthModal(); } 
-        else { switchCgvTab('panel-profile'); }
-    }
-
-    function submitCgvLogin() {
-        const user = document.getElementById('auth-username').value.trim();
-        const pass = document.getElementById('auth-password').value;
-        const captchaInput = document.getElementById('login-captcha').value.trim();
-        const currentLoginCaptcha = document.getElementById('login-captcha-text').innerText;
-
-        if(!user || !pass) return alert('Vui lòng nhập đầy đủ tài khoản và mật khẩu!');
-        if(captchaInput.toUpperCase() !== currentLoginCaptcha.toUpperCase()) return alert('Mã bảo vệ Captcha không chính xác!');
-        if(user !== "nguyenngocgiavy1812@gmail.com" || pass !== "123456") return alert('Tài khoản hoặc mật khẩu không đúng!');
-        
-        isUserLoggedInState = true;
-        alert(`Chào mừng thành viên: Gia Vy đăng nhập thành công!`);
-        closeAuthModal();
-
-        const authLinkBox = document.getElementById('top-bar-auth-link');
-        authLinkBox.removeAttribute('onclick');
-        authLinkBox.innerHTML = `
-            <span class="sub-nav-icon">👤</span> XIN CHÀO, GIA VY! 
-            <span onclick="handleCgvLogout(event)" style="color: #0066cc; margin-left: 8px; cursor: pointer; text-decoration: underline; font-weight: bold;">THOÁT</span>
-        `;
-        document.getElementById('top-bar-ticket-link').innerHTML = `<span class="sub-nav-icon">🎬</span> LỊCH SỬ GIAO DỊCH`;
-        switchCgvTab('panel-profile');
-    }
-
-    function submitCgvRegister() {
-        const name = document.getElementById('reg-name').value.trim();
-        const phone = document.getElementById('reg-phone').value.trim();
-        const email = document.getElementById('reg-email').value.trim();
-        const password = document.getElementById('reg-password').value;
-        const captchaInput = document.getElementById('reg-captcha').value.trim();
-        const currentRegCaptcha = document.getElementById('reg-captcha-text').innerText;
-        
-        if (!name || !phone || !email || !password) return alert("Vui lòng điền đầy đủ thông tin!");
-        if (captchaInput.toUpperCase() !== currentRegCaptcha.toUpperCase()) return alert("Mã xác thực Captcha đăng ký không khớp!");
-        
-        closeAuthModal(); openOtpModal();
-    }
-
-    function switchMovieFilterTab(filter) {
-        const mainTitle = document.getElementById('tab-title-now');
-        const subTitle = document.getElementById('tab-title-coming');
-        currentMovieFilter = filter;
-        if(filter === 'now_showing') {
-            if(mainTitle) mainTitle.className = "tab-title-main";
-            if(subTitle) subTitle.className = "tab-title-sub";
-            document.getElementById('bc-current-text').innerText = "Phim Đang Chiếu";
-        } else {
-            if(mainTitle) mainTitle.className = "tab-title-sub";
-            if(subTitle) subTitle.className = "tab-title-main";
-            document.getElementById('bc-current-text').innerText = "Phim Sắp Chiếu";
-        }
-        renderCgvInterface();
-    }
-
-    function quickBookMovie(movieTitle) {
-        switchCgvTab('panel-booking');
-        const selectCombo = document.getElementById('cgv-combo-movie');
-        if(selectCombo) { selectCombo.value = movieTitle; onMovieOrTimeChange(); }
-    }
-
-    function selectTime(t) {
-        if(isHoldingState) return alert("Hóa đơn đã khóa thanh toán!");
-        selectedShowtime = t; selectedSeats = []; calculateCgvCart(); renderCgvInterface();
-    }
-
-    function onMovieOrTimeChange() { resetHoldState(); selectedSeats = []; calculateCgvCart(); renderCgvInterface(); }
-
-    function updateFnbQty(val) {
-        if(isHoldingState) return alert("Hóa đơn đã chốt!");
-        fnbQty += val; if(fnbQty < 0) fnbQty = 0;
-        document.getElementById('fnb-qty').innerText = fnbQty;
-        document.getElementById('sum-fnb').innerText = fnbQty + " Combo";
-        calculateCgvCart();
-    }
-
-    function calculateCgvCart() {
-        document.getElementById('sum-seats').innerText = selectedSeats.join(', ') || 'Chưa chọn';
-        let total = 0;
-        selectedSeats.forEach(id => {
-            if(id.startsWith('C')) total += 110000;
-            else if(id.startsWith('D')) total += 250000;
-            else total += 90000;
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) console.log("Lỗi gửi mail: ", error);
+            else console.log("Email đã được gửi thành công: " + info.response);
         });
-        total += (fnbQty * 85000); currentPriceTotal = total;
-        document.getElementById('sum-total').innerText = total.toLocaleString('vi-VN') + " đ";
     }
 
-   function switchCgvTab(panelId, filterType = 'now_showing') {
-    if (cgvNavigationHistory[cgvNavigationHistory.length - 1] !== panelId) { cgvNavigationHistory.push(panelId); }
-    document.getElementById('bc-back-btn').style.display = (cgvNavigationHistory.length > 1) ? 'inline-block' : 'none';
+    res.json({ success: true, ticketId, qrCodeUrl });
+});
 
-    document.querySelectorAll('.cgv-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById(panelId).classList.add('active');
-
-    const parentBc = document.getElementById('bc-parent-text');
-    const currentBc = document.getElementById('bc-current-text');
-
-    if(panelId === 'panel-movies') {
-        document.getElementById('lnk-movies').classList.add('active');
-        switchMovieFilterTab(filterType);
-        document.getElementById('payment-sticky-bar').style.display = 'none';
-    }
-    
-    // ĐOẠN CẬP NHẬT CHO TAB RẠP CGV TRÊN SCRIPT GỐC
-    if(panelId === 'panel-booking') {
-        if(parentBc) parentBc.innerText = "Đặt Vé Trực Tuyến";
-        if(currentBc) currentBc.innerText = "Chọn Suất Chiếu & Ghế Ngồi";
-        document.getElementById('payment-sticky-bar').style.display = 'block';
-        
-        // Kích hoạt vẽ thanh 30 ngày chiếu ngay khi chuyển tab
-        generateCgvDateSlider(); 
-    } else if(panelId !== 'panel-booking') {
-        document.getElementById('payment-sticky-bar').style.display = 'none';
-    }
-    
-    if(panelId === 'panel-profile') {
-        if(parentBc) parentBc.innerText = "Thành Viên";
-        if(currentBc) currentBc.innerText = "Tài Khoản CGV";
-        switchProfileSubTab('chung');
-    }
-    renderCgvInterface();
-}
-
-    function handleBreadcrumbBack() {
-        if (cgvNavigationHistory.length <= 1) return;
-        cgvNavigationHistory.pop(); 
-        const prevPage = cgvNavigationHistory[cgvNavigationHistory.length - 1];
-        switchCgvTab(prevPage);
-        cgvNavigationHistory.pop(); 
-    }
-
-    function goHomeFromBc() { cgvNavigationHistory = ['panel-movies']; switchCgvTab('panel-movies', 'now_showing'); }
-
-    function renderCgvInterface() {
-        const movieZone = document.getElementById('cgv-movie-list');
-        const selectCombo = document.getElementById('cgv-combo-movie');
-        if (!movieZone || !selectCombo) return;
-
-        movieZone.innerHTML = '';
-        let rankCounter = 1;
-
-        serverData.movies.forEach((m) => {
-            // Kiểm tra trạng thái bộ lọc Đang chiếu/Sắp chiếu
-            if (m.status === currentMovieFilter) {
-                
-                // KIỂM TRA ĐIỀU KIỆN TÌM KIẾM TỪ KHÓA (Kèm so sánh không dấu/chữ hoa chữ thường)
-                const matchesKeyword = m.title.toLowerCase().includes(activeSearchKeyword) || 
-                                      m.genre.toLowerCase().includes(activeSearchKeyword);
-                
-                if (activeSearchKeyword === "" || matchesKeyword) {
-                    let ribbonColor = "ribbon-blue";
-                    if(rankCounter === 1) ribbonColor = "ribbon-red";
-                    if(rankCounter === 2) ribbonColor = "ribbon-orange";
-
-                    let actionBtnHTML = m.status === 'now_showing'
-                        ? `<button class="btn-cgv-buy-ticket-spec" onclick="quickBookMovie('${m.title}')">🎟️ MUA VÉ</button>`
-                        : `<button class="btn-cgv-buy-ticket-spec" style="background-color:#555; cursor:not-allowed;" disabled>📋 SẮP CHIẾU</button>`;
-
-                    movieZone.innerHTML += `
-                        <div class="movie-spec-card">
-                            <div class="poster-wrapper-box">
-                                <span class="age-label-badge">${m.status === 'now_showing' ? 'T16' : 'P'}</span>
-                                <div class="rank-ribbon ${ribbonColor}">${rankCounter}</div>
-                                <div class="poster-main-body-img" onclick="viewMovieDetailText('${m.title}', '${m.genre}')">
-                                    <span style="color:#666; font-size:11px; font-weight:bold;">CGV CINEMAS POSTER</span>
-                                </div>
-                            </div>
-                            <div class="movie-spec-info-text">
-                                <h3 class="movie-spec-title" onclick="viewMovieDetailText('${m.title}', '${m.genre}')">${m.title}</h3>
-                                <p>Thể loại: <b>${m.genre}</b></p>
-                            </div>
-                            <div class="movie-spec-action-zone">${actionBtnHTML}</div>
-                        </div>
-                    `;
-                    rankCounter++;
-                }
-            }
-        });
-
-        const currentMovie = selectCombo.value || (selectCombo.options[0] ? selectCombo.options[0].value : "");
-        document.getElementById('sum-movie-title').innerText = currentMovie || '-';
-
-        // Suất chiếu
-        const timeGrid = document.getElementById('cgv-showtime-grid');
-        if (timeGrid) {
-            timeGrid.innerHTML = '';
-            serverData.showtimes.forEach(t => {
-                const activeClass = (t === selectedShowtime) ? 'active' : '';
-                timeGrid.innerHTML += `<div class="showtime-btn ${activeClass}" onclick="selectTime('${t}')">${t}</div>`;
-            });
-        }
-        document.getElementById('sum-showtime').innerText = selectedShowtime || '-';
-
-        // Ghế ngồi
-        const seatGrid = document.getElementById('cgv-seat-grid');
-        if (seatGrid) {
-            seatGrid.innerHTML = '';
-            const activeSeatMap = serverData.masterSeatStore[currentMovie]?.[selectedShowtime] || {};
-
-            Object.keys(activeSeatMap).forEach(id => {
-                const s = activeSeatMap[id];
-                let seatType = "Standard";
-                if(id.startsWith('C')) seatType = "VIP";
-                if(id.startsWith('D')) seatType = "Sweetbox";
-
-                const div = document.createElement('div');
-                div.className = `cgv-seat ${seatType} ${s.status}`;
-                div.innerText = id;
-
-                if (selectedSeats.includes(id)) div.classList.add('selected');
-
-                if (!isHoldingState && s.status === 'available') {
-                    div.onclick = () => {
-                        if (selectedSeats.includes(id)) selectedSeats = selectedSeats.filter(x => x !== id);
-                        else selectedSeats.push(id);
-                        calculateCgvCart();
-                        renderCgvInterface();
-                    };
-                }
-                seatGrid.appendChild(div);
-            });
-        }
-    }
-
-    function handleMainAction() {
-        if(selectedSeats.length === 0) return alert('Vui lòng chọn ghế trước!');
-        const currentMovie = document.getElementById('cgv-combo-movie').value;
-        const currentEmail = document.getElementById('profile-field-email') ? document.getElementById('profile-field-email').value : "hoang2026@gmail.com";
-
-        if (!isHoldingState) {
-            fetch('/api/seats/hold', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ movie: currentMovie, showtime: selectedShowtime, seats: selectedSeats })
-            }).then(res => res.json()).then(data => {
-                if(data.success) {
-                    isHoldingState = true;
-                    document.getElementById('btn-main-action').innerText = "Thanh Toán Ngay";
-                    document.getElementById('btn-main-action').style.background = "#10B981";
-                    document.getElementById('hold-timer').style.display = "block";
-                    startCountdown(data.expiresAt);
-                } else { alert(data.message); }
-            });
-        } else {
-            fetch('/api/seats/checkout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ movie: currentMovie, showtime: selectedShowtime, seats: selectedSeats, email: currentEmail })
-            }).then(res => res.json()).then(data => {
-                if(data.success) {
-                    clearInterval(timerInterval);
-                    document.getElementById('hold-timer').style.display = "none";
-                    const invoiceZone = document.getElementById('cgv-invoice-zone');
-                    invoiceZone.innerHTML = `
-                        <div class="invoice-card" style="border: 2px dashed var(--cgv-gold); padding:20px; background:#fffdf9;">
-        <div style="font-size: 20px; font-weight:900; color:#e71a0f; text-align:center;">CGV E-TICKET WALLET</div>
-        <div style="text-align:center;"><img src="${data.qrCodeUrl}" style="margin:10px 0;"></div>
-        <h3>MÃ ĐẶT VÉ: ${data.ticketId}</h3>
-        <p>Phim: <b>${currentMovie}</b> | Ngày chiếu: <b style="color:var(--cgv-red);">${selectedDateStr}</b> | Suất: <b>${selectedShowtime}</b></p>
-        <p>Ghế: ${selectedSeats.join(', ')}</p>
-    </div>
-                    `;
-                    resetHoldState(); selectedSeats = []; fnbQty = 0;
-                    document.getElementById('fnb-qty').innerText = "0"; calculateCgvCart();
-                    switchCgvTab('panel-profile');
-                    switchProfileSubTab('lichsu');
-                }
-            });
-        }
-    }
-function generateCgvDateSlider() {
-    const container = document.getElementById('cgv-dynamic-date-slider');
-    if (!container) return;
-    container.innerHTML = '';
-
-    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    
-    // Tạo mốc thời gian thực tại thời điểm năm 2026
-    const now = new Date(2026, 5, 8); // Tháng 6 (Index bắt đầu từ 0 nên 5 tức là tháng 6)
-
-    for (let i = 0; i < 30; i++) {
-        const targetDate = new Date(2026, 5, 8);
-        targetDate.setDate(now.getDate() + i);
-
-        const month = (targetDate.getMonth() + 1).toString().padStart(2, '0');
-        const dateNum = targetDate.getDate().toString().padStart(2, '0');
-        const dayName = daysOfWeek[targetDate.getDay()];
-        const fullDateId = `2026-${month}-${dateNum}`;
-
-        // Đặt ngày đầu tiên (08) làm mặc định
-        if (i === 0 && !selectedDateStr) {
-            selectedDateStr = fullDateId;
-        }
-
-        const activeClass = (selectedDateStr === fullDateId) ? 'active' : '';
-
-        container.innerHTML += `
-            <div class="cgv-date-card ${activeClass}" onclick="selectCgvBookingDate('${fullDateId}')">
-                <div class="date-top">${month}<br>${dayName}</div>
-                <div class="date-main">${dateNum}</div>
-            </div>
-        `;
-    }
-}
-    function startCountdown(expiresAt) {
-        clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            const remain = expiresAt - Date.now();
-            if (remain <= 0) {
-                clearInterval(timerInterval); alert("Hết thời gian giữ ghế 5 phút!");
-                resetHoldState(); selectedSeats = []; calculateCgvCart();
-            } else {
-                const minutes = Math.floor(remain / 60000); const seconds = Math.floor((remain % 60000) / 1000);
-                document.getElementById('timer-string').innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }
-        }, 1000);
-    }
-
-    function resetHoldState() {
-        clearInterval(timerInterval); isHoldingState = false;
-        document.getElementById('hold-timer').style.display = "none";
-        document.getElementById('btn-main-action').innerText = "Giữ Ghế Tạm Thời";
-        document.getElementById('btn-main-action').style.background = "#e71a0f";
-    }
-
-    function switchProfileSubTab(sub) {
-        document.querySelectorAll('.arrow-btn').forEach(b => b.classList.remove('active'));
-        ['chung', 'chitiet', 'matma', 'the', 'diem', 'lichsu'].forEach(p => { 
-            const panel = document.getElementById('pro-panel-' + p);
-            if(panel) panel.classList.remove('active'); 
-        });
-        
-        const currentBtn = document.getElementById('pro-subtab-btn-' + sub);
-        const currentPanel = document.getElementById('pro-panel-' + sub);
-        
-        if(currentBtn) currentBtn.classList.add('active');
-        if(currentPanel) currentPanel.classList.add('active');
-    }
-
-    function activateEditableFormFields() {
-        document.querySelectorAll('.profile-readonly-input').forEach(input => {
-            input.removeAttribute('readonly'); input.style.border = '1px solid var(--cgv-red)'; input.style.background = '#fff';
-        });
-        document.getElementById('btn-save-profile').style.display = 'block';
-    }
-
-    function saveUpdatedProfileInformationData() {
-        document.querySelectorAll('.profile-readonly-input').forEach(input => {
-            input.setAttribute('readonly', true); input.style.border = '1px solid #ccc'; input.style.background = '#f4f2ec';
-        });
-        document.getElementById('btn-save-profile').style.display = 'none';
-        alert("Cập nhật thông tin tài khoản mới thành công!");
-    }
-</script>
-</body>
-</html>
+const PORT = 3000;
+server.listen(PORT, () => {
+    console.log(`Hệ thống chạy tại: http://127.0.0.1:${PORT}`);
+});

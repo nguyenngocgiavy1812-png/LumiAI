@@ -401,3 +401,120 @@ header {
 .btn-cgv-buy-ticket-spec:hover {
     background-color: #b31010;
 }
+/* ==========================================================================
+   CSS THANH CHỌN NGÀY CHIẾU PHIM 
+   ========================================================================== */
+.cgv-date-selector-wrapper {
+    width: 100%;
+    background-color: #fdfcf7;
+    border: 1px solid #cccccc;
+    padding: 15px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+.cgv-date-slider-container {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-behavior: smooth;
+}
+/* Định dạng thanh cuộn ngang mảnh mai */
+.cgv-date-slider-container::-webkit-scrollbar {
+    height: 4px;
+}
+.cgv-date-slider-container::-webkit-scrollbar-thumb {
+    background: #cccccc;
+    border-radius: 2px;
+}
+.cgv-date-card {
+    flex: 0 0 65px;
+    background: white;
+    border: 1px solid #e2e2e2;
+    border-radius: 4px;
+    padding: 6px 4px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    font-family: Arial, sans-serif;
+}
+.cgv-date-card .date-top {
+    font-size: 11px;
+    color: #666666;
+    margin-bottom: 2px;
+}
+.cgv-date-card .date-main {
+    font-size: 26px;
+    font-weight: bold;
+    color: #555555;
+    line-height: 1;
+}
+/* Trạng thái ngày đang được lựa chọn */
+.cgv-date-card.active {
+    border: 2px solid #111111;
+    box-shadow: inset 0 0 0 1px #111111;
+}
+.cgv-date-card.active .date-main {
+    color: #111111;
+}
+
+/* ==========================================================================
+   CSS POPUP QUÊN MẬT KHẨU CHUẨN MẪU 
+   ========================================================================== */
+.cgv-forgot-box {
+    background-color: #fdfcf7; /* Nền kem gốm cổ điển */
+    width: 550px;
+    border: 1px solid #cccccc;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    position: relative;
+    font-family: Arial, sans-serif;
+}
+.cgv-forgot-header {
+    background-color: #8c8c8c; /* Thanh xám phẳng */
+    padding: 14px 20px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: left;
+}
+.cgv-forgot-body {
+    padding: 30px 40px;
+    text-align: left;
+}
+.cgv-forgot-body label {
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+    color: #333333;
+    margin-bottom: 8px;
+}
+.cgv-forgot-body label span {
+    color: #e71a0f;
+}
+.btn-cgv-forgot-submit {
+    background-color: #bc251b;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+.btn-cgv-forgot-submit:disabled {
+    background-color: #d86861;
+    cursor: not-allowed;
+}
+.cgv-forgot-back-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #bc251b;
+    text-decoration: none;
+    font-size: 13px;
+}
+.cgv-forgot-back-link:hover {
+    text-decoration: underline;
+}

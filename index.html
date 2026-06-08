@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>CGV Cinemas Vietnam - Booking Flow</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* CSS bổ sung trực tiếp cho phần đếm ngược thời gian */
+        .countdown-timer {
+            background: #fff5f5;
+            border: 1px solid var(--cgv-red);
+            color: var(--cgv-red);
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: none;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo" onclick="switchCgvTab('panel-movies')">CGV<span>CINEMAS</span></div>
+            <div class="nav-menu">
+                <a href="#" class="nav-link active" id="lnk-movies" onclick="switchCgvTab('panel-movies')">Phim Đang Chiếu</a>
+                <a href="#" class="nav-link" id="lnk-booking" onclick="switchCgvTab('panel-booking')">Mua Vé Trực Tuyến</a>
+                <a href="#" class="nav-link" id="lnk-profile" onclick="switchCgvTab('panel-profile')">Thành Viên CGV</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-wrapper">
+
+        <div id="panel-movies" class="cgv-panel active">
+            <div class="section-title">Phim Đang Chiếu Tại Rạp</div>
+            <div style="display: flex; gap: 25px;" id="cgv-movie-list"></div>
+        </div>
+
+        <div id="panel-booking" class="cgv-panel">
+            <div class="section-title">Mua Vé Nhanh Trực Tuyến</div>
+            
+            <div class="booking-selector">
+                <div class="select-box-wrapper">
+                    <h3>1. Chọn Phim Trực Thuộc</h3>
+                    <select id="cgv-combo-movie" onchange="onMovieOrTimeChange()"></select>
+                </div>
+                <div class="select-box-wrapper">
+                    <h3>2. Chọn Suất Chiếu</h3>
+                    <div class="showtime-grid" id="cgv-showtime-grid"></div>
+                </div>
+            </div>
+
+            <div class="countdown-timer" id="hold-timer">
+                ⚠️ Ghế của bạn đang được giữ tạm thời. Vui lòng thanh toán trong: <span id="timer-string">05:00</span>
+            </div>
+
+            <div class="section-title">3. Chọn Ghế Ngồi Phòng Chiếu</div>
+            <div class="cinema-room">
+                <div class="screen-curve"></div>
+                <div class="screen-text">Màn Hình (Screen)</div>
+                <div class="seat-grid" id="cgv-seat-grid"></div>
+                
+                <div class="seat-legend">
+                    <div class="legend-item"><div class="legend-box" style="background:#666;"></div> Thường</div>
+                    <div class="legend-item"><div class="legend-box" style="background:#b31010;"></div> VIP</div>
+                    <div class="legend-item"><div class="legend-box" style="background:#e25b8b;"></div> Sweetbox</div>
+                    <div class="legend-item"><div class="legend-box" style="background:var(--cgv-gold);"></div> Người khác giữ</div>
+                    <div class="legend-item"><div class="legend-box" style="background:var(--cgv-red);"></div> Ghế bạn chọn</div>
+                </div>
+            </div>
+
+            <div class="section-title">4. Chọn Tiện Ích Combo Bắp Nước</div>
+            <div class="fnb-container">
+                <div class="fnb-item">
+                    <div class="fnb-img">🍿</div>
+                    <div class="fnb-details">
+                        <div class="fnb-title">CGV Combo Thần Thánh</div>
+                        <div class="fnb-price">85,000 đ</div>
+                    </div>
+                    <div class="qty-counter">
+                        <button class="qty-btn" onclick="updateFnbQty(-1)">-</button>
+                        <span id="fnb-qty" style="font-weight:bold;">0</span>
+                        <button class="qty-btn" onclick="updateFnbQty(1)">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-profile" class="cgv-panel">
+            <div class="section-title">Tài Khoản Thành Viên & Vé Điện Tử</div>
+            <div id="cgv-invoice-zone">
+                <p style="text-align:center; color:#777; padding:40px 0;">Bạn chưa thực hiện giao dịch đặt vé nào.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="cgv-payment-bar" id="payment-sticky-bar" style="display:none;">
+        <div class="payment-container">
+            <div class="ticket-summary">
+                <div class="summary-block"><div class="summary-label">Phim</div><div class="summary-value" id="sum-movie-title">-</div></div>
+                <div class="summary-block"><div class="summary-label">Suất Chiếu</div><div class="summary-value" id="sum-showtime" style="color:var(--cgv-gold)">-</div></div>
+                <div class="summary-block"><div class="summary-label">Ghế</div><div class="summary-value" id="sum-seats" style="color:var(--cgv-gold)">Chưa chọn</div></div>
+                <div class="summary-block"><div class="summary-label">Bắp Nước</div><div class="summary-value" id="sum-fnb">0 Combo</div></div>
+                <div class="summary-block"><div class="summary-label">Tổng Tiền</div><div class="summary-value highlight" id="sum-total">0 đ</div></div>
+            </div>
+            <button class="btn-cgv-next" id="btn-main-action" onclick="handleMainAction()">Giữ Ghế Tạm Thời</button>
+        </div>
+    </div>
+
+<script>
+    let ws = new WebSocket('ws://127.0.0.1:3000');
+    let serverData = { masterSeatStore: {}, movies: [], showtimes: [] };
+    
+    let selectedSeats = [];
+    let selectedShowtime = "";
+    let fnbQty = 0;
+    let currentPriceTotal = 0;
+    let isHoldingState = false; // Biến kiểm soát trạng thái đơn hàng
+    let timerInterval = null;
+
+    ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+        if (msg.type === 'SYNC_DATA') {
+            serverData = msg.data;
+            if(!selectedShowtime && serverData.showtimes.length > 0) {
+                selectedShowtime = serverData.showtimes[0];
+            }
+            renderCgvInterface();
+        }
+    };
+
+    function switchCgvTab(panelId) {
+        document.querySelectorAll('.cgv-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.getElementById(panelId).classList.add('active');
+        
+        if(panelId === 'panel-movies') document.getElementById('lnk-movies').classList.add('active');
+        if(panelId === 'panel-booking') {
+            document.getElementById('lnk-booking').classList.add('active');
+            document.getElementById('payment-sticky-bar').style.display = 'block';
+        } else {
+            document.getElementById('payment-sticky-bar').style.display = 'none';
+        }
+        if(panelId === 'panel-profile') document.getElementById('lnk-profile').classList.add('active');
+    }
+
+    function renderCgvInterface() {
+        // Render Tab Phim Đang Chiếu
+        const movieZone = document.getElementById('cgv-movie-list');
+        const selectCombo = document.getElementById('cgv-combo-movie');
+        if (!movieZone || !selectCombo) return;
+
+        movieZone.innerHTML = '';
+        const prevMovieSelected = selectCombo.value;
+        selectCombo.innerHTML = '';
+
+        serverData.movies.forEach((m) => {
+            movieZone.innerHTML += `
+                <div style="width: 220px; background:#fff; border:1px solid #eee; padding:10px; text-align:center;">
+                    <div style="width:100%; height:280px; background:#111; color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; border-radius:4px;">POSTER</div>
+                    <h4 style="margin:10px 0 5px 0; font-size:14px; text-align:left;">${m.title}</h4>
+                    <button onclick="quickBookMovie('${m.title}')" style="background:#e71a0f; color:white; border:none; width:100%; padding:8px; margin-top:10px; font-weight:bold; cursor:pointer;">MUA VÉ NGAY</button>
+                </div>
+            `;
+            selectCombo.innerHTML += `<option value="${m.title}">${m.title}</option>`;
+        });
+
+        if(prevMovieSelected) selectCombo.value = prevMovieSelected;
+        const currentMovie = selectCombo.value;
+        document.getElementById('sum-movie-title').innerText = currentMovie || '-';
+
+        // Render Giờ Chiếu
+        const timeGrid = document.getElementById('cgv-showtime-grid');
+        timeGrid.innerHTML = '';
+        serverData.showtimes.forEach(t => {
+            const activeClass = (t === selectedShowtime) ? 'active' : '';
+            timeGrid.innerHTML += `<div class="showtime-btn ${activeClass}" onclick="selectTime('${t}')">${t}</div>`;
+        });
+        document.getElementById('sum-showtime').innerText = selectedShowtime || '-';
+
+        // Render Sơ đồ ghế dựa trên cặp [Phim] + [Giờ Chiếu] đã chọn
+        const seatGrid = document.getElementById('cgv-seat-grid');
+        seatGrid.innerHTML = '';
+
+        const activeSeatMap = serverData.masterSeatStore[currentMovie]?.[selectedShowtime] || {};
+
+        Object.keys(activeSeatMap).forEach(id => {
+            const s = activeSeatMap[id];
+            let seatType = "Standard";
+            if(id.startsWith('C')) seatType = "VIP";
+            if(id.startsWith('D')) seatType = "Sweetbox";
+
+            const div = document.createElement('div');
+            div.className = `cgv-seat ${seatType} ${s.status}`;
+            div.innerText = id;
+
+            if (selectedSeats.includes(id)) div.classList.add('selected');
+
+            // Nếu đang trong trạng thái "Giữ ghế thành công", khóa không cho chỉnh sửa sơ đồ ghế nữa
+            if (!isHoldingState && s.status === 'available') {
+                div.onclick = () => {
+                    if (selectedSeats.includes(id)) {
+                        selectedSeats = selectedSeats.filter(x => x !== id);
+                    } else {
+                        selectedSeats.push(id);
+                    }
+                    calculateCgvCart();
+                };
+            }
+            seatGrid.appendChild(div);
+        });
+    }
+
+    function quickBookMovie(movieTitle) {
+        document.getElementById('cgv-combo-movie').value = movieTitle;
+        resetHoldState();
+        switchCgvTab('panel-booking');
+        renderCgvInterface();
+    }
+
+    function selectTime(t) {
+        if(isHoldingState) return alert("Bạn đang trong tiến trình thanh toán cho suất chiếu cũ. Không thể đổi giờ!");
+        selectedShowtime = t;
+        selectedSeats = [];
+        calculateCgvCart();
+    }
+
+    function onMovieOrTimeChange() {
+        resetHoldState();
+        selectedSeats = [];
+        calculateCgvCart();
+    }
+
+    function updateFnbQty(val) {
+        if(isHoldingState) return alert("Hóa đơn đã chốt, không thể thay đổi bắp nước!");
+        fnbQty += val;
+        if(fnbQty < 0) fnbQty = 0;
+        document.getElementById('fnb-qty').innerText = fnbQty;
+        document.getElementById('sum-fnb').innerText = fnbQty + " Combo";
+        calculateCgvCart();
+    }
+
+    function calculateCgvCart() {
+        document.getElementById('sum-seats').innerText = selectedSeats.join(', ') || 'Chưa chọn';
+        let total = 0;
+        selectedSeats.forEach(id => {
+            if(id.startsWith('C')) total += 110000;
+            else if(id.startsWith('D')) total += 250000;
+            else total += 90000;
+        });
+        total += (fnbQty * 85000);
+        currentPriceTotal = total;
+        document.getElementById('sum-total').innerText = total.toLocaleString('vi-VN') + " đ";
+        renderCgvInterface();
+    }
+
+    // XỬ LÝ NÚT BẤM CHÍNH (LUỒNG KẾT HỢP)
+    function handleMainAction() {
+        if(selectedSeats.length === 0) return alert('Vui lòng chọn ghế trước!');
+
+        const currentMovie = document.getElementById('cgv-combo-movie').value;
+
+        if (!isHoldingState) {
+            // LUỒNG 1: Gửi lệnh GIỮ GHẾ lên server
+            fetch('/api/seats/hold', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ movie: currentMovie, showtime: selectedShowtime, seats: selectedSeats })
+            }).then(res => res.json()).then(data => {
+                if(data.success) {
+                    isHoldingState = true;
+                    document.getElementById('btn-main-action').innerText = "Thanh Toán Ngay";
+                    document.getElementById('btn-main-action').style.background = "#10B981";
+                    document.getElementById('hold-timer').style.display = "block";
+                    startCountdown(data.expiresAt);
+                } else {
+                    alert(data.message);
+                }
+            });
+        } else {
+            // LUỒNG 2: Bấm lần 2 -> Tiến hành THANH TOÁN CHÍNH THỨC
+            fetch('/api/seats/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ movie: currentMovie, showtime: selectedShowtime, seats: selectedSeats })
+            }).then(res => res.json()).then(data => {
+                if(data.success) {
+                    clearInterval(timerInterval);
+                    document.getElementById('hold-timer').style.display = "none";
+                    
+                    const invoiceZone = document.getElementById('cgv-invoice-zone');
+                    invoiceZone.innerHTML = `
+                        <div class="invoice-card">
+                            <div style="font-size: 24px; font-weight:900; color:#e71a0f; margin-bottom:10px;">CGV E-TICKET WALLET</div>
+                            <div style="background:white; padding:15px; display:inline-block; border:1px solid #ddd; margin: 10px 0;">
+                                <img src="${data.qrCodeUrl}" alt="QR Code Vé">
+                            </div>
+                            <h3>MÃ ĐẶT VÉ: ${data.ticketId}</h3>
+                            <p>Phim: <b>${currentMovie}</b></p>
+                            <p>Suất chiếu: <b>${selectedShowtime}</b></p>
+                            <p>Vị trí ghế: ${selectedSeats.join(', ')}</p>
+                            <div style="font-size:16px; font-weight:bold; color:#b37d1b">Tổng tiền: ${currentPriceTotal.toLocaleString()}đ</div>
+                        </div>
+                    `;
+                    resetHoldState();
+                    selectedSeats = [];
+                    fnbQty = 0;
+                    document.getElementById('fnb-qty').innerText = "0";
+                    calculateCgvCart();
+                    switchCgvTab('panel-profile');
+                }
+            });
+        }
+    }
+
+    function startCountdown(expiresAt) {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            const remain = expiresAt - Date.now();
+            if (remain <= 0) {
+                clearInterval(timerInterval);
+                alert("Hết thời gian giữ ghế 5 phút! Ghế của bạn đã được giải phóng tự động.");
+                resetHoldState();
+                selectedSeats = [];
+                calculateCgvCart();
+            } else {
+                const minutes = Math.floor(remain / 60000);
+                const seconds = Math.floor((remain % 60000) / 1000);
+                document.getElementById('timer-string').innerText = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }, 1000);
+    }
+
+    function resetHoldState() {
+        clearInterval(timerInterval);
+        isHoldingState = false;
+        document.getElementById('hold-timer').style.display = "none";
+        document.getElementById('btn-main-action').innerText = "Giữ Ghế Tạm Thời";
+        document.getElementById('btn-main-action').style.background = "#e71a0f";
+    }
+</script>
+</body>
+</html>

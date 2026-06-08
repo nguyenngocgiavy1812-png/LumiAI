@@ -19,13 +19,11 @@ body {
 }
 
 /* ==========================================================================
-   HEADER CHUẨN THƯƠNG HIỆU CGV
+   HEADER CHUẨN THƯƠNG HIỆU CGV (NÂNG CẤP DROPDOWN)
    ========================================================================== */
 header {
     background-color: var(--cgv-black);
     border-bottom: 3px solid var(--cgv-gold);
-    padding: 15px 0;
-    text-align: center;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -36,6 +34,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
 }
 .logo {
     font-size: 32px;
@@ -43,6 +42,7 @@ header {
     color: var(--cgv-red);
     letter-spacing: -1px;
     cursor: pointer;
+    padding: 15px 0;
 }
 .logo span {
     color: var(--text-light);
@@ -51,22 +51,94 @@ header {
     letter-spacing: 2px;
     margin-left: 5px;
 }
+
+/* Menu chính */
 .nav-menu {
     display: flex;
-    gap: 25px;
+    gap: 0; /* Xóa khoảng cách cũ để các vùng hover liền mạch */
+    height: 100%;
 }
+
+/* Các khối phần tử cha trên menu */
+.nav-item-wrapper {
+    position: relative;
+    padding: 22px 20px; /* Tạo vùng đệm mượt mà khi di chuột */
+}
+
 .nav-link {
+    color: #333333; /* Giống CGV: Chữ mặc định trên thanh đen là màu tối hoặc xám trắng tùy phiên bản */
     color: var(--text-light);
     text-decoration: none;
     font-weight: bold;
-    font-size: 15px;
+    font-size: 16px;
     text-transform: uppercase;
     transition: color 0.2s;
+    letter-spacing: 0.5px;
 }
-.nav-link:hover, .nav-link.active {
+
+/* Hiệu ứng hover cho chữ trên thanh menu chính */
+.nav-item-wrapper:hover .nav-link, .nav-link.active {
     color: var(--cgv-gold);
 }
 
+/* KHỐI DROPDOWN MENU THẢ XUỐNG CHUẨN CGV */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%; /* Xuất hiện ngay sát dưới mép thanh header */
+    left: 10px;
+    width: 200px;
+    background-color: #333333; /* Màu nền tối hạt đá */
+    /* Giả lập lớp vân nhám sần sùi đặc trưng bằng hiệu ứng CSS lặp */
+    background-image: radial-gradient(rgba(255,255,255,0.15) 1px, transparent 0),
+                      radial-gradient(rgba(0,0,0,0.3) 1px, transparent 0);
+    background-size: 4px 4px;
+    background-position: 0 0, 2px 2px;
+    
+    border: 1px solid #444444;
+    border-top: none;
+    padding: 5px 0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    z-index: 1010;
+}
+
+/* Căn chỉnh riêng cho các hộp dropdown để nó không lệch màn hình */
+.nav-item-wrapper:hover .dropdown-menu {
+    display: block;
+}
+
+/* Các liên kết nhỏ bên trong hộp dropdown */
+.dropdown-item {
+    display: block;
+    padding: 12px 15px;
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    border-bottom: 1px solid #444444;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+/* Hiệu ứng hover của menu con */
+.dropdown-item:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+    color: var(--cgv-gold);
+    padding-left: 20px; /* Tạo hiệu ứng đẩy chữ nhẹ sang phải */
+}
+
+/* ĐƯỜNG CHỈ CHẤM ĐỎ NGĂN CÁCH (NẰM DƯỚI HEADER) */
+.cgv-red-line {
+    width: 100%;
+    height: 4px;
+    background-color: var(--cgv-red);
+    /* Giả lập đường gạch chấm màu trắng/đỏ đan xen */
+    background-image: linear-gradient(to right, transparent 50%, rgba(255,255,255,0.4) 50%);
+    background-size: 6px 100%;
+}
 /* ==========================================================================
    KHUNG CHỨA NỘI DUNG (MAIN WRAPPER)
    ========================================================================== */
@@ -312,7 +384,120 @@ select {
     border-radius: 6px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.02);
 }
-
+/* ==========================================================================
+   POPUP ĐĂNG NHẬP CHUẨN CGV (MÔ PHỎNG THEO IMAGE_147859.PNG)
+   ========================================================================== */
+.cgv-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none; /* Mặc định ẩn */
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+.cgv-modal-overlay.open {
+    display: flex;
+}
+.cgv-auth-box {
+    background-color: #fdfcf7; /* Nền kem chuẩn CGV */
+    width: 450px;
+    border: 2px solid #333;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    position: relative;
+    padding-bottom: 25px;
+}
+/* Hệ thống Tab điều hướng Đăng nhập / Đăng ký */
+.cgv-auth-tabs {
+    display: flex;
+    background-color: #bc251b; /* Màu đỏ sẫm nền tab */
+}
+.cgv-tab-btn {
+    flex: 1;
+    padding: 15px 0;
+    text-align: center;
+    color: #e5c1c0;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    text-transform: uppercase;
+    border: none;
+    background: transparent;
+}
+.cgv-tab-btn.active {
+    background-color: #e71a0f; /* Đỏ tươi khi active */
+    color: white;
+}
+/* Nội dung Form bên trong */
+.cgv-auth-form {
+    padding: 25px 30px;
+}
+.cgv-form-group {
+    margin-bottom: 18px;
+}
+.cgv-form-group label {
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #333;
+}
+.cgv-input-text {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #777777; /* Viền tối mỏng theo mẫu */
+    background: white;
+    color: #333;
+    font-size: 14px;
+    box-sizing: border-box;
+    border-radius: 3px;
+}
+.cgv-input-text::placeholder {
+    color: #999;
+}
+/* Nút Đăng nhập chính */
+.btn-cgv-submit {
+    background-color: #e71a0f;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: uppercase;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s;
+}
+.btn-cgv-submit:hover {
+    background-color: #b81108;
+}
+.cgv-auth-footer {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 13px;
+}
+.cgv-auth-footer a {
+    color: #0066cc;
+    text-decoration: none;
+}
+.cgv-auth-footer a:hover {
+    text-decoration: underline;
+}
+/* Nút đóng modal dấu X */
+.cgv-modal-close {
+    position: absolute;
+    top: -35px;
+    right: 0;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    font-weight: bold;
+}
 /* ĐIỀU KHIỂN CHUYỂN TAB */
 .cgv-panel { display: none; }
 .cgv-panel.active { display: block; }

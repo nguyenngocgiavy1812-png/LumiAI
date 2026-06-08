@@ -46,6 +46,7 @@
                         <a href="#" class="dropdown-item" onclick="switchCgvTab('panel-movies', 'coming_soon')">Phim Sắp Chiếu</a>
                     </div>
                 </div>
+                
                 <div class="nav-item-wrapper">
                     <a href="#" class="nav-link" id="lnk-profile" onclick="handleProfileTabAccess()">Thành Viên</a>
                 </div>
@@ -56,20 +57,25 @@
 
     <div class="main-wrapper">
         
-        <div class="cgv-breadcrumb-bar" style="display: flex; align-items: center; gap: 5px; margin-bottom: 20px;">
-            <span class="bc-link" onclick="handleBreadcrumbBack()" style="cursor: pointer; font-weight: bold; color: #e71a0f; margin-right: 10px; display: none;" id="bc-back-btn">⬅ Trở lại</span>
-            <span class="bc-link" onclick="goHomeFromBc()" style="cursor: pointer;">🏠</span> &gt; 
-            <span id="bc-parent-text">Phim</span> &gt; 
-            <span class="current-bc" id="bc-current-text">Phim Đang Chiếu</span>
-        </div>
+        <!-- PANEL 1: DANH SÁCH PHIM TRANG CHỦ THEO IMAGE_C2C046.JPG -->
+<div id="panel-movies" class="cgv-panel active">
+    <!-- Thanh điều hướng Breadcrumb -->
+    <div class="cgv-breadcrumb-bar" style="display: flex; align-items: center; gap: 5px;">
+    <span class="bc-link" onclick="handleBreadcrumbBack()" style="cursor: pointer; font-weight: bold; color: #e71a0f; margin-right: 10px; display: none;" id="bc-back-btn">⬅ Trở lại</span>
+    <span class="bc-link" onclick="goHomeFromBc()" style="cursor: pointer;">🏠</span> &gt; 
+    <span id="bc-parent-text">Phim</span> &gt; 
+    <span class="current-bc" id="bc-current-text">Phim Đang Chiếu</span>
+</div>
 
-        <div id="panel-movies" class="cgv-panel active">
-            <div class="cgv-movie-tab-header">
-                <h1 class="tab-title-main" onclick="switchMovieFilterTab('now_showing')">Phim Đang Chiếu</h1>
-                <span class="tab-title-sub" onclick="switchMovieFilterTab('coming_soon')">PHIM SẮP CHIẾU</span>
-            </div>
-            <div class="cgv-movie-grid-spec" id="cgv-movie-list"></div>
-        </div>
+    <!-- Tiêu đề tab phim -->
+    <div class="cgv-movie-tab-header">
+        <h1 class="tab-title-main" onclick="switchMovieFilterTab('now_showing')">Phim Đang Chiếu</h1>
+        <span class="tab-title-sub" onclick="switchMovieFilterTab('coming_soon')">PHIM SẮP CHIẾU</span>
+    </div>
+    
+    <!-- Lưới hiển thị danh sách phim -->
+    <div class="cgv-movie-grid-spec" id="cgv-movie-list"></div>
+</div>
 
         <div id="panel-movie-detail" class="cgv-panel">
             <div class="section-title">Chi Tiết Phim Sinh Động</div>
@@ -457,6 +463,7 @@
             }
         }
 
+        // 🎯 TASK 2: CHUYỂN PHÂN HỆ XEM CHI TIẾT PHIM KHI CLICK BẤM POSTER
         function viewMovieDetailText(title, genre) {
             document.getElementById('detail-movie-title').innerText = title;
             document.getElementById('detail-movie-genre').innerText = genre;
@@ -464,6 +471,7 @@
             switchCgvTab('panel-movie-detail');
         }
 
+        // 🎯 TASK 5: ĐÓNG MỞ VÀ XÁC THỰC MÃ OTP MODAL
         function openOtpModal() { document.getElementById('otp-modal').classList.add('open'); }
         function closeOtpModal() { document.getElementById('otp-modal').classList.remove('open'); }
         function submitOtpVerification() {
@@ -475,6 +483,7 @@
             toggleAuthTab('login');
         }
 
+        // 🎯 TASK 7: ĐÓNG MỞ VÀ XỬ LÝ QUÊN MẬT KHẨU
         function openForgotModal() { closeAuthModal(); document.getElementById('forgot-modal').classList.add('open'); }
         function closeForgotModal() { document.getElementById('forgot-modal').classList.remove('open'); openAuthModal(); }
         function submitForgotRequest() {
@@ -484,6 +493,7 @@
             closeForgotModal();
         }
 
+        // 🎯 TASK 8: ĐỒ HỌA POPUP XÁC NHẬN ĐĂNG XUẤT MODAL
         function handleCgvLogout(e) {
             e.stopPropagation();
             document.getElementById('logout-confirm-modal').classList.add('open');
@@ -535,6 +545,7 @@
             alert(`Chào mừng thành viên: Gia Vy đăng nhập thành công!`);
             closeAuthModal();
 
+            // SỬA ĐỒ HỌA THEO ĐÚNG HÌNH ẢNH MẪU HOÀN TOÀN CỦA GIA VY (IMAGE_C34389.PNG)
             const authLinkBox = document.getElementById('top-bar-auth-link');
             authLinkBox.removeAttribute('onclick');
             authLinkBox.innerHTML = `
@@ -571,6 +582,7 @@
             checkboxes.forEach(cb => { if (!cb.checked) allChecked = false; });
             if (!allChecked) return alert("Vui lòng tích chọn đồng ý với tất cả các điều khoản chính sách!");
             
+            // KHI ĐĂNG KÝ THÀNH CÔNG -> ĐẨY SANG POPUP XÁC THỰC OTP (TASK 5)
             closeAuthModal();
             openOtpModal();
         }
@@ -613,14 +625,16 @@
             alert("Hệ thống cập nhật thông tin tài khoản mới thành công!");
         }
 
-        // 🌟 LOGIC QUAN TRỌNG: Mảng kiểm soát ngăn xếp lịch sử di chuyển
+        // Mảng lưu lịch sử các trang đã đi qua để phục vụ tính năng nút Back
         let cgvNavigationHistory = ['panel-movies']; 
 
         function switchCgvTab(panelId, filterType = 'now_showing') {
+            // Quản lý lưu lịch sử (Không lưu trùng nếu nhấn lại trang hiện tại)
             if (cgvNavigationHistory[cgvNavigationHistory.length - 1] !== panelId) {
                 cgvNavigationHistory.push(panelId);
             }
 
+            // Hiện nút "⬅ Trở lại" nếu không phải đang ở trang chủ đầu tiên
             const backBtn = document.getElementById('bc-back-btn');
             if (cgvNavigationHistory.length > 1) {
                 backBtn.style.display = 'inline-block';
@@ -628,17 +642,21 @@
                 backBtn.style.display = 'none';
             }
 
+            // Ẩn tất cả các trang và gỡ active menu
             document.querySelectorAll('.cgv-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             
+            // Kích hoạt hiển thị trang được chọn
             document.getElementById(panelId).classList.add('active');
             
+            // 🌟 TỰ ĐỘNG CẬP NHẬT CHỮ TRÊN THANH ĐIỀU HƯỚNG THEO TỪNG TRANG
             const parentBc = document.getElementById('bc-parent-text');
             const currentBc = document.getElementById('bc-current-text');
 
             if (panelId === 'panel-movies') {
                 document.getElementById('lnk-movies').classList.add('active');
                 currentMovieFilter = filterType;
+                document.getElementById('movie-panel-title').innerText = filterType === 'now_showing' ? "Phim Đang Chiếu Tại Rạp" : "Phim Sắp Chiếu (Sắp Ra Mắt)";
                 
                 parentBc.innerText = "Phim";
                 currentBc.innerText = filterType === 'now_showing' ? "Phim Đang Chiếu" : "Phim Sắp Chiếu";
@@ -664,33 +682,42 @@
             renderCgvInterface();
         }
 
+        // 🌟 HÀM XỬ LÝ KHI NGƯỜI DÙNG ẤN NÚT "⬅ TRỞ LẠI"
         function handleBreadcrumbBack() {
             if (cgvNavigationHistory.length <= 1) return;
 
+            // Loại bỏ trang hiện tại ra khỏi lịch sử
             cgvNavigationHistory.pop(); 
+            
+            // Lấy ra trang trước đó liền kề
             const previousPagePanelId = cgvNavigationHistory[cgvNavigationHistory.length - 1];
             
+            // Quay lại trang đó mà không ghi đè thêm lịch sử mới
             document.querySelectorAll('.cgv-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             
             document.getElementById(previousPagePanelId).classList.add('active');
             
+            // Cập nhật lại nút ẩn/hiện Back
             if (cgvNavigationHistory.length <= 1) {
                 document.getElementById('bc-back-btn').style.display = 'none';
             }
 
+            // Gọi lại switch để cập nhật text text breadcrumb tương ứng
             switchCgvTab(previousPagePanelId);
+            // Khử dòng lịch sử bị lặp do lệnh switch gọi lại ở trên
             cgvNavigationHistory.pop(); 
         }
 
+        // Hàm tắt nhanh khi người dùng click thẳng vào icon Ngôi nhà 🏠
         function goHomeFromBc() {
             cgvNavigationHistory = ['panel-movies'];
-            document.getElementById('bc-back-btn').style.display = 'none';
             switchCgvTab('panel-movies', 'now_showing');
         }
 
+        // Mạng dữ liệu Mockup chứa thông tin phim chính xác theo ảnh image_c2c046.jpg
         const mockMoviesData = [
-            { id: 1, rank: 1, age: 'T18', title: 'MA XÓ', genre: 'Kinh Dị', duration: '102 phút', release: '05-06-2026', img: '' },
+            { id: 1, rank: 1, age: 'T18', title: 'MA XÓ', genre: 'Kinh Dị', duration: '102 phút', release: '05-06-2026', img: 'https://www.cgv.vn/media/catalog/product/cache/1/image/1800x/71252117777b696995f019344547b749/m/a/ma_xo_poster.jpg' },
             { id: 2, rank: 2, age: 'P', title: 'Phim Điện Ảnh Doraemon: Nobita và Lâu Đài Dưới Đáy Biển (Phiên bản mới)', genre: 'Hoạt Hình, Phiêu Lưu', duration: '101 phút', release: '22-05-2026', img: '' },
             { id: 3, rank: 3, age: 'T13', title: 'TÊN CẬU LÀ GÌ.', genre: 'Hoạt Hình', duration: '107 phút', release: '05-06-2026', img: '' },
             { id: 4, rank: null, age: 'T13', title: 'HE-MAN VÀ NHỮNG CHIẾN BINH VŨ TRỤ', genre: 'Hành Động, Khoa Học Viễn Tưởng', duration: '140 phút', release: '05-06-2026', img: '' }
@@ -705,10 +732,12 @@
             if (selectCombo) selectCombo.innerHTML = '';
 
             mockMoviesData.forEach((m) => {
+                // Tạo thẻ combo select cho phòng đặt vé nhanh nếu có
                 if (selectCombo) {
                     selectCombo.innerHTML += `<option value="${m.title}">${m.title}</option>`;
                 }
 
+                // Xử lý huy hiệu xếp hạng top ribbon bên góc phải
                 let rankBadge = '';
                 if (m.rank === 1) rankBadge = '<div class="rank-ribbon ribbon-red">1</div>';
                 else if (m.rank === 2) rankBadge = '<div class="rank-ribbon ribbon-orange">2</div>';
@@ -716,6 +745,7 @@
 
                 movieZone.innerHTML += `
                     <div class="movie-spec-card">
+                        <!-- Khối chứa ảnh poster phim, nhãn tuổi và thứ hạng -->
                         <div class="poster-wrapper-box">
                             <div onclick="viewMovieDetailText('${m.title}', '${m.genre}')" class="poster-main-body-img">
                                 <span style="font-size: 13px; font-weight: bold; color: #aaa;">POSTER</span>
@@ -723,12 +753,16 @@
                             <div class="age-label-badge">${m.age}</div>
                             ${rankBadge}
                         </div>
+                        
+                        <!-- Khối thông tin chi tiết dạng text căn lề trái -->
                         <div class="movie-spec-info-text">
                             <h4 class="movie-spec-title" onclick="viewMovieDetailText('${m.title}', '${m.genre}')">${m.title}</h4>
                             <p><strong>Thể loại:</strong> ${m.genre}</p>
                             <p><strong>Thời lượng:</strong> ${m.duration}</p>
                             <p><strong>Khởi chiếu:</strong> ${m.release}</p>
                         </div>
+                        
+                        <!-- Nút mua vé màu đỏ bo góc nhỏ nhắn nằm giữa -->
                         <div class="movie-spec-action-zone">
                             <button class="btn-cgv-buy-ticket-spec" onclick="quickBookMovie('${m.title}')">
                                 🎟️ MUA VÉ
@@ -739,6 +773,7 @@
             });
         }
 
+        // Hàm hỗ trợ click chuyển đổi hiệu ứng tiêu đề tab nhanh
         function switchMovieFilterTab(filter) {
             const mainTitle = document.querySelector('.tab-title-main');
             const subTitle = document.querySelector('.tab-title-sub');
@@ -750,6 +785,102 @@
                 subTitle.style.color = '#111';
             }
             renderCgvInterface();
+        }
+
+        function quickBookMovie(movieTitle) {
+            document.getElementById('cgv-combo-movie').value = movieTitle;
+            resetHoldState();
+            switchCgvTab('panel-booking');
+        }
+        function selectTime(t) {
+            if(isHoldingState) return alert("Hóa đơn đã chốt, không thể đổi khung giờ!");
+            selectedShowtime = t; selectedSeats = []; calculateCgvCart();
+        }
+        function onMovieOrTimeChange() { resetHoldState(); selectedSeats = []; calculateCgvCart(); }
+        function updateFnbQty(val) {
+            if(isHoldingState) return alert("Hóa đơn đã khóa giữ chỗ!");
+            fnbQty += val; if(fnbQty < 0) fnbQty = 0;
+            document.getElementById('fnb-qty').innerText = fnbQty;
+            document.getElementById('sum-fnb').innerText = fnbQty + " Combo";
+            calculateCgvCart();
+        }
+
+        function calculateCgvCart() {
+            document.getElementById('sum-seats').innerText = selectedSeats.join(', ') || 'Chưa chọn';
+            let total = 0;
+            selectedSeats.forEach(id => {
+                if(id.startsWith('C')) total += 110000;
+                else if(id.startsWith('D')) total += 250000;
+                else total += 90000;
+            });
+            total += (fnbQty * 85000); currentPriceTotal = total;
+            document.getElementById('sum-total').innerText = total.toLocaleString('vi-VN') + " đ";
+            renderCgvInterface();
+        }
+
+        function handleMainAction() {
+            if(selectedSeats.length === 0) return alert('Vui lòng chọn ghế trước!');
+            const currentMovie = document.getElementById('cgv-combo-movie').value;
+
+            if (!isHoldingState) {
+                fetch('/api/seats/hold', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ movie: currentMovie, showtime: selectedShowtime, seats: selectedSeats })
+                }).then(res => res.json()).then(data => {
+                    if(data.success) {
+                        isHoldingState = true;
+                        document.getElementById('btn-main-action').innerText = "Thanh Toán Ngay";
+                        document.getElementById('btn-main-action').style.background = "#10B981";
+                        document.getElementById('hold-timer').style.display = "block";
+                        startCountdown(data.expiresAt);
+                    } else { alert(data.message); }
+                });
+            } else {
+                fetch('/api/seats/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ movie: currentMovie, showtime: selectedShowtime, seats: selectedSeats })
+                }).then(res => res.json()).then(data => {
+                    if(data.success) {
+                        clearInterval(timerInterval);
+                        document.getElementById('hold-timer').style.display = "none";
+                        const invoiceZone = document.getElementById('cgv-invoice-zone');
+                        invoiceZone.innerHTML = `
+                            <div class="invoice-card" style="text-align: left; max-width: 100%; border: 2px dashed var(--cgv-gold);">
+                                <div style="font-size: 20px; font-weight:900; color:#e71a0f; margin-bottom:10px;">CGV E-TICKET WALLET</div>
+                                <h3>MÃ ĐẶT VÉ: ${data.ticketId}</h3>
+                                <p>Phim: <b>${currentMovie}</b></p><p>Suất chiếu: <b>${selectedShowtime}</b></p><p>Ghế: ${selectedSeats.join(', ')}</p>
+                                <div style="font-size:16px; font-weight:bold; color:#b37d1b">Tổng tiền: ${currentPriceTotal.toLocaleString()}đ</div>
+                            </div>
+                        `;
+                        resetHoldState(); selectedSeats = []; fnbQty = 0;
+                        document.getElementById('fnb-qty').innerText = "0"; calculateCgvCart();
+                        switchCgvTab('panel-profile');
+                        switchProfileSubTab('lichsu');
+                    }
+                });
+            }
+        }
+
+        function startCountdown(expiresAt) {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                const remain = expiresAt - Date.now();
+                if (remain <= 0) {
+                    clearInterval(timerInterval); alert("Hết thời gian giữ ghế 5 phút!");
+                    resetHoldState(); selectedSeats = []; calculateCgvCart();
+                } else {
+                    const minutes = Math.floor(remain / 60000); const seconds = Math.floor((remain % 60000) / 1000);
+                    document.getElementById('timer-string').innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+        function resetHoldState() {
+            clearInterval(timerInterval); isHoldingState = false;
+            document.getElementById('hold-timer').style.display = "none";
+            document.getElementById('btn-main-action').innerText = "Giữ Ghế Tạm Thời";
+            document.getElementById('btn-main-action').style.background = "#e71a0f";
         }
     </script>
 </body>

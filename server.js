@@ -137,7 +137,7 @@ app.post('/api/seats/checkout', (req, res) => {
                     <p>🎟️ <b>Mã đặt vé bí mật:</b> <span style="font-size: 18px; color: #e5a93b; font-weight: bold;">${ticketId}</span></p>
                     <hr style="border-color: #eee;">
                     <div style="text-align: center; margin-top: 15px;">
-                        <p style="font-size: 12px; color: #666;">Vui lòng đưa mã QR bên dưới cho nhân viên soát cửa rạp phim:</p>
+                        <p sưtyle="font-size: 12px; color: #666;">Vui lòng đưa mã QR bên dưới cho nhân viên soát cửa rạp phim:</p>
                         <img src="${qrCodeUrl}" alt="QR Code Vé">
                     </div>
                 </div>
@@ -152,7 +152,21 @@ app.post('/api/seats/checkout', (req, res) => {
 
     res.json({ success: true, ticketId, qrCodeUrl });
 });
+// API 3: Hủy giao dịch - Giải phóng ghế đang giữ
+app.post('/api/seats/cancel', (req, res) => {
+    const { movie, showtime, seats } = req.body;
+    const currentSeats = masterSeatStore[movie]?.[showtime];
 
+    if (currentSeats) {
+        seats.forEach(id => {
+            if (currentSeats[id] && currentSeats[id].status === 'holding') {
+                currentSeats[id] = { status: 'available', expiresAt: null };
+            }
+        });
+        broadcast('SYNC_DATA', { masterSeatStore, movies, showtimes });
+    }
+    res.json({ success: true });
+});
 const PORT = 3000;
 server.listen(PORT, () => {
     console.log(`Hệ thống chạy tại: http://127.0.0.1:${PORT}`);

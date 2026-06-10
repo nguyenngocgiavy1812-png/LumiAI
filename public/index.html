@@ -5,18 +5,21 @@
     <title>LAS Cinemas Vietnam - Official Premium Interface</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 🌟 1: XOÁ SẠCH BANNER LỖI - ĐỂ NỀN TRẮNG BÓC TOÀN BỘ TRANG WEB */
+        /* 🌟 1: ĐỂ NỀN TRẮNG BÓC TOÀN BỘ WORKSPACE KHÔNG LO LỖI CACHE */
         body {
             background: #ffffff !important;
             margin: 0;
             padding: 0;
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             color: #333333;
+            width: 100%;
+            overflow-x: hidden;
         }
         
+        /* 🌟 KHẮC PHỤC TRIỆT ĐỂ: Ép khung container giãn rộng tối đa 100% để giao diện không bị co rúm ở giữa */
         .global-viewport-container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 100% !important; /* Mở rộng toàn màn hình chuẩn UX */
             margin: 0 auto;
             background-color: #ffffff;
             box-sizing: border-box;
@@ -24,13 +27,13 @@
 
         .main-wrapper {
             width: 100% !important;
-            max-width: 1200px !important;
+            max-width: 1200px !important; /* Căn giữa vùng nội dung chính rộng rãi 1200px */
             margin: 0 auto !important;
             padding: 20px !important;
             box-sizing: border-box;
         }
 
-        /* Menu Icon phụ trợ phong cách LAS */
+        /* Thanh Menu Icon phụ trợ LAS mở rộng 1200px cân đối */
         .las-sub-icon-menu-bar {
             display: flex;
             justify-content: space-around;
@@ -40,7 +43,7 @@
             padding: 15px 10px;
             margin: 15px auto;
             width: 100%;
-            max-width: 1160px;
+            max-width: 1200px;
             box-sizing: border-box;
         }
         .icon-menu-item {
@@ -66,7 +69,7 @@
             font-size: 20px;
         }
 
-        /* 🌟 2: THIẾT KẾ GIAO DIỆN LUỒNG ĐẶT VÉ CHUẨN HAI CỘT ĐEN - ĐỎ (IMAGE_267E2F.PNG) */
+        /* GIAO DIỆN LUỒNG ĐẶT VÉ HAI CỘT ĐEN - ĐỎ (IMAGE_267E2F.PNG) */
         .las-step-bar-container {
             display: flex;
             justify-content: space-around;
@@ -75,6 +78,7 @@
             border-radius: 6px;
             margin-bottom: 25px;
             color: #ffffff;
+            width: 100%;
         }
         .step-item {
             display: flex;
@@ -89,12 +93,14 @@
             color: #e71a0f;
         }
 
+        /* Lưới 2 cột phân tách rõ ràng, không bị dồn ép diện tích */
         .booking-two-columns-layout {
             display: grid;
             grid-template-columns: 1fr 380px;
-            gap: 25px;
+            gap: 30px;
             margin-top: 20px;
             align-items: start;
+            width: 100%;
         }
 
         .left-interactive-column {
@@ -102,6 +108,7 @@
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             padding: 25px;
+            box-sizing: border-box;
         }
 
         .right-invoice-sticky-column {
@@ -110,6 +117,7 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            box-sizing: border-box;
         }
 
         .invoice-info-card {
@@ -148,9 +156,7 @@
             width: 70px;
             transition: all 0.2s;
         }
-        .btn-flow-back:hover {
-            background: #eeeeee;
-        }
+        .btn-flow-back:hover { background: #eeeeee; }
 
         .btn-flow-next {
             background: #e71a0f;
@@ -166,9 +172,7 @@
             letter-spacing: 1px;
             transition: all 0.2s;
         }
-        .btn-flow-next:hover {
-            background: #b31010;
-        }
+        .btn-flow-next:hover { background: #b31010; }
 
         .cgv-search-bar-container {
             width: 100%;
@@ -191,16 +195,79 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
+
+        /* ==========================================================================
+           🌟 ĐÃ SỬA: MODAL & FORM ĐĂNG NHẬP / ĐĂNG KÝ (ĐÚNG MẪU ẢNH)
+           ========================================================================== */
+        .cgv-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .cgv-modal-overlay.open { display: flex; }
+        .cgv-auth-split-box { background-color: #fdfcf7; width: 850px; display: flex; box-shadow: 0 0 20px rgba(0,0,0,0.5); position: relative; border-radius: 4px; overflow: hidden; }
+        .cgv-modal-close { position: absolute; top: -35px; right: 0; color: white; font-size: 24px; cursor: pointer; font-weight: bold; }
+        
+        .auth-left-form { flex: 1.2; background-color: #fdfcf7; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+        
+        /* Tabs Đỏ Đặc Trưng */
+        .cgv-auth-tabs { display: flex; background-color: #e71a0f; padding: 0 10px; }
+        .cgv-tab-btn { flex: 1; padding: 15px 0; text-align: center; color: white; font-weight: bold; font-size: 16px; cursor: pointer; border: none; background: transparent; opacity: 0.7; border-bottom: 3px solid transparent; text-transform: uppercase; }
+        .cgv-tab-btn.active { opacity: 1; border-bottom: 3px solid white; }
+        
+        .cgv-auth-content { padding: 20px 30px; }
+        .auth-form-panel { display: none; }
+        .auth-form-panel.active { display: block; }
+        
+        .cgv-form-group { margin-bottom: 12px; text-align: left; }
+        .cgv-form-group label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px; color: #333; }
+        .cgv-form-group label span { color: #e71a0f; } /* Dấu sao đỏ */
+        .cgv-input-text { width: 100%; padding: 8px 10px; border: 1px solid #ccc; font-size: 13px; box-sizing: border-box; background: #fff; outline: none; }
+        .cgv-input-text:focus { border: 1px solid #222; }
+        
+        .captcha-row { display: flex; gap: 10px; align-items: center; }
+        .captcha-input { width: 50% !important; }
+        .captcha-img-box { flex-grow: 1; display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid #ccc; padding: 2px 10px; height: 34px; box-sizing: border-box;}
+        .captcha-text { font-family: 'Courier New', Courier, monospace; font-size: 20px; font-weight: bold; letter-spacing: 2px; color: #333; font-style: italic; }
+        .captcha-refresh { color: #e5a93b; font-size: 18px; font-weight: bold; cursor: pointer; }
+        
+        .btn-cgv-submit { background-color: #e71a0f; color: white; font-weight: bold; font-size: 15px; width: 100%; padding: 12px; border: none; cursor: pointer; margin-top: 10px; border-radius: 2px; text-transform: uppercase; }
+        .btn-cgv-submit:hover { background-color: #b31010; }
+        .cgv-auth-footer { text-align: center; margin-top: 15px; font-size: 13px; }
+        .cgv-auth-footer a { color: #0066cc; text-decoration: none; }
+        
+        /* Form Đăng ký cuộn */
+        .scrollable-register-form { max-height: 420px; overflow-y: auto; padding-right: 10px; }
+        .scrollable-register-form::-webkit-scrollbar { width: 6px; }
+        .scrollable-register-form::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+        .birth-gender-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+        .select-birth { padding: 6px !important; background: white; border: 1px solid #ccc; font-size: 13px; cursor: pointer;}
+        .radio-lbl { font-size: 13px; font-weight: bold !important; display: inline-flex; align-items: center; gap: 3px; cursor: pointer;}
+        .toggle-password-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 16px; color: #666; }
+        
+        /* Checkbox chính sách */
+        .policy-checkboxes { margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .check-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: #111; font-weight: bold; cursor: pointer; line-height: 1.4; }
+        .check-item span { color: #333; font-weight: normal; }
+        .check-item b { color: #e71a0f; font-weight: bold; }
+        
+        .auth-right-banner { flex: 0.8; background: white; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; position: relative; }
+        .banner-slide-content { text-align: center; width: 100%; }
+        .banner-illustration { position: relative; height: 140px; margin-bottom: 15px; }
+        .coin { background: #f1d377; border: 3px dashed #dfb234; border-radius: 50%; position: absolute; }
+        .coin-main { width: 100px; height: 100px; bottom: 10px; left: calc(50% - 50px); display: flex; align-items: center; justify-content: center; font-size: 32px; color: #bfa143; }
+        .coin-sub1 { width: 30px; height: 30px; top: 15px; left: 25%; }
+        .coin-sub2 { width: 22px; height: 22px; top: 30px; right: 25%; }
+        .banner-title { font-size: 16px; font-weight: bold; color: #666; text-transform: uppercase; }
+        .slider-arrow { font-size: 32px; color: #ccc; cursor: pointer; }
+        .dot-indicators { display: flex; justify-content: center; gap: 6px; }
+        .dot { width: 8px; height: 8px; background-color: #ccc; border-radius: 50%; }
+        .dot.active { background-color: #e71a0f; }
     </style>
 </head>
 <body>
 
 <div class="global-viewport-container">
 
-    <!-- UTILITY TOP BAR -->
     <div class="cgv-top-utility-wrapper">
         <div class="cgv-top-sub-nav" style="border-top: 3px solid #e71a0f;">
-            <div class="sub-nav-container" style="max-width: 1160px;">
+            <div class="sub-nav-container" style="max-width: 1200px;">
                 <div class="sub-nav-links-right">
                     <a href="#" class="sub-nav-item" onclick="switchCgvTab('panel-news')">
                         <span class="sub-nav-icon">🎫</span> TIN MỚI & ƯU ĐÃI
@@ -220,9 +287,8 @@
         </div>
     </div>
 
-    <!-- MAIN HEADER -->
     <header>
-        <div class="header-container" style="max-width: 1160px;">
+        <div class="header-container" style="max-width: 1200px;">
             <div class="logo" onclick="switchCgvTab('panel-movies', 'now_showing')">LAS<span>CINEMAS</span></div>
             <div class="nav-menu">
                 <div class="nav-item-wrapper">
@@ -243,7 +309,6 @@
         <div class="cgv-red-line"></div>
     </header>
 
-    <!-- THANH MENU ICON TIÊU CHUẨN LAS -->
     <div class="las-sub-icon-menu-bar">
         <div class="icon-menu-item" onclick="switchCgvTab('panel-movies', 'now_showing')"><div class="icon-circle">🎬</div><span>PHIM ĐANG CHIẾU</span></div>
         <div class="icon-menu-item" onclick="switchCgvTab('panel-booking')"><div class="icon-circle">🎟️</div><span>MUA VÉ NHANH</span></div>
@@ -253,7 +318,6 @@
 
     <div class="main-wrapper">
         
-        <!-- PANEL 1: DANH SÁCH PHIM TRANG CHỦ -->
         <div id="panel-movies" class="cgv-panel active">
             <div class="cgv-breadcrumb-bar" style="display: flex; align-items: center; gap: 5px;">
                 <span class="bc-link" onclick="handleBreadcrumbBack()" style="cursor: pointer; font-weight: bold; color: #e71a0f; margin-right: 10px; display: none;" id="bc-back-btn">⬅ Trở lại</span>
@@ -262,7 +326,6 @@
                 <span class="current-bc" id="bc-current-text">Phim Đang Chiếu</span>
             </div>
 
-            <!-- SLIDER BANNER LỚN TRUNG TÂM KHÔNG LO LỖI ĐƯỜNG DẪN -->
             <div style="width: 100%; margin: 0 auto 30px auto; position: relative; background: #111111; min-height: 400px; display: flex; align-items: center; justify-content: center; border: 4px solid #111111; box-shadow: 0 6px 16px rgba(0,0,0,0.15);">
                 <img src="https://www.cgv.vn/media/banner/images/v/n/vnpay_cgv_1100x80.jpg" alt="LAS Promotion Banner" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                 <div style="position: absolute; left: 25px; top: 50%; transform: translateY(-50%); color: #fff; font-size: 42px; cursor: pointer; user-select: none; opacity: 0.7; font-weight: bold;">‹</div>
@@ -289,7 +352,6 @@
             
             <div class="cgv-movie-grid-spec" id="cgv-movie-list"></div>
 
-            <!-- DANH MỤC EVENT -->
             <div style="display: flex; align-items: center; justify-content: center; margin: 50px auto 20px auto; width: 100%;">
                 <div style="flex: 1; height: 2px; background: linear-gradient(to left, #222, transparent);"></div>
                 <h2 style="font-family: 'Impact', 'Arial Black', sans-serif; font-size: 36px; letter-spacing: 2px; color: #111; margin: 0 25px; text-transform: uppercase; font-weight: 900; line-height: 1;">
@@ -305,7 +367,6 @@
             </div>
         </div>
 
-        <!-- PANEL 2: CHI TIẾT PHIM -->
         <div id="panel-movie-detail" class="cgv-panel">
             <div class="section-title">Chi Tiết Phim Sinh Động</div>
             <div class="movie-detail-container" style="display: flex; gap: 30px; text-align: left;">
@@ -323,10 +384,8 @@
             </div>
         </div>
 
-        <!-- PANEL 3: QUY TRÌNH ĐẶT VÉ (ĐÃ TÁI CẤU TRÚC 2 CỘT HOÀN TOÀN THEO IMAGE_267E2F.PNG) -->
         <div id="panel-booking" class="cgv-panel">
             
-            <!-- Thanh trạng thái các bước đặt vé (Step Bar) -->
             <div class="las-step-bar-container">
                 <div class="step-item active">🔴 1. Chọn ghế</div>
                 <div style="opacity:0.3;">➔</div>
@@ -339,7 +398,6 @@
 
             <div class="booking-two-columns-layout">
                 
-                <!-- CỘT TRÁI: KHU VỰC TƯƠNG TÁC CHỌN GHẾ & BẮP NƯỚC -->
                 <div class="left-interactive-column">
                     <div class="select-box-wrapper" style="margin-bottom: 20px; background: #fafafa; padding: 15px; border: 1px solid #e0e0e0;">
                         <h3 style="color:#e71a0f; font-weight: bold; margin-top:0;">1. Chọn Phim Trực Thuộc</h3>
@@ -380,7 +438,6 @@
                     <div class="fnb-container" id="cgv-fnb-menu" style="grid-template-columns: 1fr; gap: 12px;"></div>
                 </div>
 
-                <!-- CỘT PHẢI: KHỐI HOÁ ĐƠN STICKY CỐ ĐỊNH CHUẨN ĐEN - ĐỎ (IMAGE_267E2F.PNG) -->
                 <div class="right-invoice-sticky-column">
                     <div class="invoice-info-card">
                         <h3 style="margin: 0 0 15px 0; font-size: 18px; border-bottom: 1px solid #333; padding-bottom: 10px; color:#e5a93b;">THÔNG TIN PHIM</h3>
@@ -404,12 +461,9 @@
             </div>
         </div>
 
-        <!-- PANEL 4: TIN MỚI & ƯU ĐÃI -->
         <div id="panel-news" class="cgv-panel">
-            <div class="section-title" style="justify-content: center; font-size: 22px; letter-spacing: 2px;">— TIN MỚI VÀ ƯU ĐÃI —</div>
-            <div class="news-filter-header-bar">
-                <button class="news-filter-btn active">Xem tất cả</button>
-                <button class="news-filter-btn">Chọn Rạp</button>
+            <div style="text-align: center; font-size: 24px; font-weight: bold; color: #111; text-transform: uppercase; letter-spacing: 2px; margin: 30px 0 25px 0;">
+                — TIN MỚI VÀ ƯU ĐÃI —
             </div>
             
             <div class="news-grid-layout">
@@ -446,11 +500,10 @@
             </div>
         </div>
 
-        <!-- PANEL 5: THÀNH VIÊN -->
-        <div id="panel-profile" class="cgv-panel">
+        <ddiv id="panel-profile" class="cgv-panel">
             <div class="cgv-profile-layout">
                 <div class="profile-arrow-sidebar">
-                    <h2 class="sidebar-main-title">TÀI KHOẢN LAS</h2>
+                    <h2 class="sidebar-main-title">TÀI KHOẢN CGV</h2>
                     <div class="arrow-menu-list">
                         <button class="arrow-btn active" id="pro-subtab-btn-chung" onclick="switchProfileSubTab('chung')">THÔNG TIN CHUNG</button>
                         <button class="arrow-btn" id="pro-subtab-btn-chitiet" onclick="switchProfileSubTab('chitiet')">CHI TIẾT TÀI KHOẢN</button>
@@ -487,7 +540,7 @@
                             <div class="dashboard-column info-col">
                                 <p><strong>Cấp Độ Thẻ</strong> <span class="member-star-icon">★</span> <span style="color:#0066cc; font-weight: 900;">MEMBER</span></p>
                                 <p><strong>Tổng Chi Tiêu</strong> <b>0 đ</b></p>
-                                <p><strong>Điểm LAS</strong> <b>0 P</b></p>
+                                <p><strong>Điểm CGV</strong> <b>0 P</b></p>
                             </div>
                             <div class="dashboard-column action-col">
                                 <span class="dash-box-label">Thẻ Thành Viên</span>
@@ -517,7 +570,7 @@
                     <div id="pro-panel-chitiet" class="profile-sub-content"><div class="sub-content-header-title">CHI TIẾT TÀI KHOẢN</div><p style="padding: 20px; color:#666;">Cấu hình dữ liệu hồ sơ nâng cao.</p></div>
                     <div id="pro-panel-matma" class="profile-sub-content"><div class="sub-content-header-title">CÀI MẶT MÃ THANH TOÁN</div><p style="padding: 20px; color:#666;">Thiết lập mã PIN giao dịch bảo mật.</p></div>
                     <div id="pro-panel-the" class="profile-sub-content"><div class="sub-content-header-title">THẺ THÀNH VIÊN CARD</div><p style="padding: 20px; color:#666;">Mã thẻ cứng vật lý định danh thành viên.</p></div>
-                    <div id="pro-panel-diem" class="profile-sub-content"><div class="sub-content-header-title">ĐIỂM THƯỞNG TÍCH LŨY</div><p style="padding: 20px; color:#666;">Số điểm LAS point đang tích lũy.</p></div>
+                    <div id="pro-panel-diem" class="profile-sub-content"><div class="sub-content-header-title">ĐIỂM THƯỞNG TÍCH LŨY</div><p style="padding: 20px; color:#666;">Số điểm CGV point đang tích lũy.</p></div>
                     <div id="pro-panel-lichsu" class="profile-sub-content">
                         <div class="sub-content-header-title">LỊCH SỬ GIAO DỊCH VÉ</div>
                         <div id="cgv-invoice-zone" style="padding: 15px;"><p style="color:#777; font-size: 13px;">Bạn chưa thực hiện giao dịch mua vé trực tuyến nào gần đây.</p></div>
@@ -528,8 +581,10 @@
 
     </div>
 
-    <!-- CHÂN TRANG ĐỒ ÁN CHUẨN LAS CINEMAS -->
-    <footer style="background-color: #ffffff; border-top: 2px solid #222; font-family: Arial, sans-serif; width: 100%;">
+    </div>
+
+    <!-- DÁN ĐÈ LÊN KHỐI FOOTER HIỆN TẠI -->
+<footer style="background-color: #ffffff; border-top: 2px solid #222; font-family: Arial, sans-serif; width: 100%;">
     <div style="border-bottom: 1px solid #ddd; padding: 15px 0; text-align: center; background: #fff;">
         <div style="width: 100%; max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-around; font-size: 11px; font-weight: bold; color: #555; flex-wrap: wrap; gap: 10px; padding: 0 20px; box-sizing: border-box;">
             <span>4DX</span> l <span>IMAX</span> l <span>STARIUM</span> l <span>GOLD CLASS</span> l <span>L'AMOUR</span> l <span>SWEETBOX</span> l <span>PREMIUM CINEMA</span> l <span>SCREENX</span> l <span>CINE & FORÊT</span> l <span>CINE & LIVING ROOM</span> l <span>CINE & SUITE</span>
@@ -580,12 +635,10 @@
     </div>
 </footer>
 
-</div> <!-- CLOSE GLOBAL VIEWPORT CONTAINER -->
-
-    <!-- POPUP MODAL ĐĂNG NHẬP / ĐĂNG KÝ -->
-    <div class="cgv-modal-overlay" id="auth-modal">
+</div> <div class="cgv-modal-overlay" id="auth-modal">
         <div class="cgv-auth-split-box">
             <div class="cgv-modal-close" onclick="closeAuthModal()">✕</div>
+            
             <div class="auth-left-form">
                 <div class="cgv-auth-tabs">
                     <button class="cgv-tab-btn active" id="tab-login-btn" onclick="toggleAuthTab('login')">Đăng Nhập</button>
@@ -595,62 +648,77 @@
                 <div class="cgv-auth-content auth-form-panel active" id="form-login-panel">
                     <div class="cgv-form-group">
                         <label>Email hoặc số điện thoại</label>
-                        <input type="text" id="auth-username" class="cgv-input-text" placeholder="Email hoặc số điện thoại">
+                        <input type="text" id="auth-username" class="cgv-input-text" placeholder="nguyenngocgiavy1812@gmail.com">
                     </div>
                     <div class="cgv-form-group">
                         <label>Mật khẩu</label>
-                        <input type="password" id="auth-password" class="cgv-input-text" placeholder="Mật khẩu">
+                        <input type="password" id="auth-password" class="cgv-input-text" placeholder=".........">
                     </div>
                     <div class="cgv-form-group">
-                        <label>Vui lòng nhập ký tự bên dưới <span style="color:var(--cgv-red)">*</span></label>
+                        <label>Vui lòng nhập ký tự bên dưới <span>*</span></label>
                         <div class="captcha-row">
-                            <input type="text" class="cgv-input-text captcha-input" id="login-captcha" placeholder="Nhập ký tự">
+                            <input type="text" class="cgv-input-text captcha-input" id="login-captcha">
                             <div class="captcha-img-box">
-                                <span class="captcha-text" id="login-captcha-text">9W6X9N</span>
+                                <span class="captcha-text" id="login-captcha-text">IXBLT1</span>
                                 <div class="captcha-refresh" onclick="generateNewLoginCaptcha()">↻</div>
                             </div>
                         </div>
                     </div>
-                    <button class="btn-cgv-submit" onclick="submitCgvLogin()">Đăng Nhập</button>
+                    <button class="btn-cgv-submit" onclick="submitCgvLogin()">ĐĂNG NHẬP</button>
                     <div class="cgv-auth-footer">
-                        <a href="#" onclick="openForgotModal()">Bạn muốn tìm lại mật khẩu?</a>
+                        <a href="#" onclick="openForgotModal(); closeAuthModal();">Bạn muốn tìm lại mật khẩu?</a>
                     </div>
                 </div>
 
                 <div class="cgv-auth-content auth-form-panel" id="form-register-panel">
                     <div class="scrollable-register-form">
-                        <div class="cgv-form-group"><label>Tên<span style="color:var(--cgv-red)">*</span></label><input type="text" id="reg-name" class="cgv-input-text" placeholder="Tên"></div>
-                        <div class="cgv-form-group"><label>Số điện thoại<span style="color:var(--cgv-red)">*</span></label><input type="text" id="reg-phone" class="cgv-input-text" placeholder="Số điện thoại"></div>
-                        <div class="cgv-form-group"><label>Email<span style="color:var(--cgv-red)">*</span></label><input type="email" id="reg-email" class="cgv-input-text" placeholder="Email"></div>
                         <div class="cgv-form-group">
-                            <label>Mật khẩu<span style="color:var(--cgv-red)">*</span></label>
-                            <div style="position: relative;"><input type="password" id="reg-password" class="cgv-input-text" placeholder="Mật khẩu"><span class="toggle-password-icon" onclick="toggleRegPasswordState()">👁️</span></div>
+                            <label>Tên<span>*</span></label>
+                            <input type="text" id="reg-name" class="cgv-input-text" placeholder="Tên">
                         </div>
                         <div class="cgv-form-group">
-                            <label>Ngày sinh<span style="color:var(--cgv-red)">*</span></label>
+                            <label>Số điện thoại<span>*</span></label>
+                            <input type="text" id="reg-phone" class="cgv-input-text" placeholder="Số điện thoại">
+                        </div>
+                        <div class="cgv-form-group">
+                            <label>Email<span>*</span></label>
+                            <input type="email" id="reg-email" class="cgv-input-text" placeholder="Email">
+                        </div>
+                        <div class="cgv-form-group">
+                            <label>Mật khẩu<span>*</span></label>
+                            <div style="position: relative;">
+                                <input type="password" id="reg-password" class="cgv-input-text" placeholder="Mật khẩu">
+                                <span class="toggle-password-icon" onclick="toggleRegPasswordState()">👁️</span>
+                            </div>
+                        </div>
+                        <div class="cgv-form-group">
+                            <label>Ngày sinh<span>*</span></label>
                             <div class="birth-gender-row">
                                 <select class="select-birth" id="reg-birth-day"><option value="">Ngày</option></select>
                                 <select class="select-birth" id="reg-birth-month"><option value="">Tháng</option></select>
                                 <select class="select-birth" id="reg-birth-year"><option value="">Năm</option></select>
-                                <span style="margin: 0 5px; color:#333;">*</span>
+                                <span style="margin: 0 5px; color:#e71a0f;">*</span>
                                 <label class="radio-lbl"><input type="radio" name="gender" value="Nam"> Nam</label>
                                 <label class="radio-lbl"><input type="radio" name="gender" value="Nữ" checked> Nữ</label>
                             </div>
                         </div>
                         <div class="cgv-form-group">
-                            <label>Vui lòng nhập ký tự bên dưới <span style="color:var(--cgv-red)">*</span></label>
+                            <label>Vui lòng nhập ký tự bên dưới <span>*</span></label>
                             <div class="captcha-row">
-                                <input type="text" id="reg-captcha" class="cgv-input-text captcha-input" placeholder="Nhập ký tự">
-                                <div class="captcha-img-box"><span class="captcha-text" id="reg-captcha-text">A2C2Y0</span><div class="captcha-refresh" onclick="generateNewRegisterCaptcha()">↻</div></div>
+                                <input type="text" id="reg-captcha" class="cgv-input-text captcha-input">
+                                <div class="captcha-img-box">
+                                    <span class="captcha-text" id="reg-captcha-text">O3JGB</span>
+                                    <div class="captcha-refresh" onclick="generateNewRegisterCaptcha()">↻</div>
+                                </div>
                             </div>
                         </div>
                         <div class="policy-checkboxes">
-                            <label class="check-item"><input type="checkbox" class="reg-policy"> <span>Đồng ý Chính Sách Bảo Mật.</span></label>
-                            <label class="check-item"><input type="checkbox" class="reg-policy"> <span>Xác nhận thông tin hồ sơ CMND chính xác.</span></label>
-                            <label class="check-item"><input type="checkbox" class="reg-policy"> <span>Xác nhận khớp Email và Ngày sinh.</span></label>
-                            <label class="check-item"><input type="checkbox" class="reg-policy"> <span>Đồng ý Điều Khoản Sử Dụng.</span></label>
+                            <label class="check-item"><input type="checkbox" class="reg-policy"> <span>Bằng việc bấm nút "Đăng Ký" bên dưới. Tôi đồng ý cho phép CGV Việt Nam thực hiện xử lý dữ liệu cá nhân của tôi phù hợp với mục đích mà CGV Việt Nam đã thông báo tại <b>Chính Sách Bảo Mật</b>.</span></label>
+                            <label class="check-item"><input type="checkbox" class="reg-policy"> <span>Thông tin cá nhân cung cấp tại đây là chính xác và trùng khớp với thông tin tại CMND/CCCD/Thẻ Căn cước và/hoặc Giấy khai sinh (Giấy tờ tùy thân). Email cung cấp tại đây là chính xác và thuộc quyền quản lý duy nhất của tôi.</span></label>
+                            <label class="check-item"><input type="checkbox" class="reg-policy"> <span>Xác nhận email chính xác và ngày sinh khớp với thông tin trên CMND/CCCD. Nếu không trùng khớp, các thông tin này sẽ không được hỗ trợ cập nhật thay đổi và có thể không được hưởng các <b>Quyền lợi thành viên</b></span></label>
+                            <label class="check-item"><input type="checkbox" class="reg-policy"> <span>Tôi đồng ý với <b>Điều Khoản Sử Dụng Của CGV</b></span></label>
                         </div>
-                        <button class="btn-cgv-submit" style="margin-top: 15px;" onclick="submitCgvRegister()">Đăng Ký</button>
+                        <button class="btn-cgv-submit" style="margin-top: 20px;" onclick="submitCgvRegister()">ĐĂNG KÝ</button>
                     </div>
                 </div>
             </div>
@@ -667,36 +735,6 @@
             </div>
         </div>
     </div>
-
-    <!-- POPUP QUÊN MẬT KHẨU NÂNG CAO -->
-    <div class="cgv-modal-overlay" id="forgot-modal">
-        <div class="cgv-forgot-box">
-            <div class="cgv-forgot-header">Bạn muốn tìm lại mật khẩu?</div>
-            <div class="cgv-forgot-body">
-                <div class="cgv-form-group">
-                    <label>Email hoặc số điện thoại <span>*</span></label>
-                    <input type="text" id="forgot-email-input" class="cgv-input-text" style="border: 1px solid #000;" placeholder="Email hoặc số điện thoại">
-                </div>
-                
-                <div class="cgv-form-group" style="margin-top: 20px;">
-                    <label>Vui lòng nhập ký tự bên dưới <span>*</span></label>
-                    <div class="captcha-row">
-                        <input type="text" id="forgot-captcha-input" class="cgv-input-text cgv-forgot-captcha-box" style="width: 180px;" placeholder="Nhập ký tự">
-                        <div class="captcha-img-box" style="flex-grow: 1; justify-content: space-between;">
-                            <span class="captcha-text" id="forgot-captcha-text" style="letter-spacing: 3px; font-style: italic;">6IYQVX</span>
-                            <div class="captcha-refresh" onclick="generateForgotCaptcha()">↻</div>
-                        </div>
-                    </div>
-                </div>
-                <button class="btn-cgv-forgot-submit" id="btn-forgot-submit-action" onclick="executeForgotRequestSubmit()">GỬI (4)</button>
-                <div>
-                    <a href="#" class="cgv-forgot-back-link" onclick="closeForgotModal()">&laquo; Quay lại trang đăng nhập</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- POPUP XÁC THỰC OTP -->
     <div class="cgv-modal-overlay" id="otp-modal">
         <div class="cgv-auth-split-box" style="width: 450px; flex-direction: column; padding: 25px; background: #fcf8ee; border-radius: 4px; border: 2px solid #222;">
             <div class="cgv-modal-close" onclick="closeOtpModal()">✕</div>
@@ -709,11 +747,10 @@
         </div>
     </div>
 
-    <!-- POPUP XÁC NHẬN ĐĂNG XUẤT -->
     <div class="cgv-modal-overlay" id="logout-confirm-modal">
         <div class="cgv-auth-split-box" style="width: 420px; flex-direction: column; padding: 25px; background: #fcf8ee; text-align: center; border: 2px solid #222; border-radius: 4px;">
             <h3 style="color: #e71a0f; margin: 0 0 12px 0; font-weight: bold;">CẢNH BÁO ĐĂNG XUẤT</h3>
-            <p style="font-size: 14px; color: #333; margin-bottom: 25px; line-height: 1.4;">Người đẹp Vy có chắc chắn muốn đăng xuất thoát phiên làm việc an toàn này khỏi LAS Cinemas không?</p>
+            <p style="font-size: 14px; color: #333; margin-bottom: 25px; line-height: 1.4;">Bạn có chắc chắn muốn đăng xuất thoát phiên làm việc an toàn này khỏi LAS Cinemas không?</p>
             <div style="display: flex; gap: 15px;">
                 <button class="btn-cgv-submit" style="background: #777; margin: 0;" onclick="closeLogoutConfirmModal()">HỦY BỎ</button>
                 <button class="btn-cgv-submit" style="background: #e71a0f; margin: 0;" onclick="confirmCgvLogoutAction()">ĐỒNG Ý THOÁT</button>
@@ -801,28 +838,27 @@
     function closeAuthModal() { document.getElementById('auth-modal').classList.remove('open'); }
     
     function renderFnbMenu() {
-        const container = document.getElementById('cgv-fnb-menu'); 
-        if (!container) return;
-        container.innerHTML = '';
-        fnbMenu.forEach((item, index) => {
-            // Căn chỉnh bằng flexbox 2 đầu (between) cực kỳ tinh tế
-            container.innerHTML += `
-                <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ddd; padding:15px; border-radius:8px; margin-bottom:12px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
-                    <div style="display:flex; align-items:center; gap:15px;">
-                        <div style="font-size:30px; background:#f4f2ec; width:60px; height:60px; display:flex; justify-content:center; align-items:center; border-radius:8px;">${item.icon}</div>
-                        <div style="text-align:left;">
-                            <div style="font-weight:bold; font-size:14px; color:#333;">${item.name}</div>
-                            <div style="color:#e71a0f; font-weight:bold; font-size:14px; margin-top:5px;">${item.price.toLocaleString('vi-VN')} đ</div>
-                        </div>
+    const container = document.getElementById('cgv-fnb-menu'); 
+    if (!container) return;
+    container.innerHTML = '';
+    fnbMenu.forEach((item, index) => {
+        container.innerHTML += `
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ddd; padding:15px; border-radius:8px; margin-bottom:12px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <div style="font-size:30px; background:#f4f2ec; width:60px; height:60px; display:flex; justify-content:center; align-items:center; border-radius:8px;">${item.icon}</div>
+                    <div style="text-align:left;">
+                        <div style="font-weight:bold; font-size:14px; color:#333;">${item.name}</div>
+                        <div style="color:#e71a0f; font-weight:bold; font-size:14px; margin-top:5px;">${item.price.toLocaleString('vi-VN')} đ</div>
                     </div>
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <button style="width:30px; height:30px; border:1px solid #ccc; background:#fff; font-weight:bold; cursor:pointer; border-radius:4px; font-size: 16px;" onclick="updateComboQty(${index}, -1)">-</button>
-                        <span style="font-weight:bold; width:20px; text-align:center; font-size: 16px;">${item.qty}</span>
-                        <button style="width:30px; height:30px; border:1px solid #ccc; background:#fff; font-weight:bold; cursor:pointer; border-radius:4px; font-size: 16px;" onclick="updateComboQty(${index}, 1)">+</button>
-                    </div>
-                </div>`;
-        });
-    }
+                </div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <button style="width:30px; height:30px; border:1px solid #ccc; background:#fff; font-weight:bold; cursor:pointer; border-radius:4px; font-size: 16px;" onclick="updateComboQty(${index}, -1)">-</button>
+                    <span style="font-weight:bold; width:20px; text-align:center; font-size: 16px;">${item.qty}</span>
+                    <button style="width:30px; height:30px; border:1px solid #ccc; background:#fff; font-weight:bold; cursor:pointer; border-radius:4px; font-size: 16px;" onclick="updateComboQty(${index}, 1)">+</button>
+                </div>
+            </div>`;
+    });
+}
 
     function updateComboQty(index, change) {
         fnbMenu[index].qty += change;
@@ -1106,28 +1142,6 @@
 
     function onMovieOrTimeChange() { resetHoldState(); selectedSeats = []; calculateCgvCart(); renderCgvInterface(); }
 
-    function calculateCgvCart() {
-        document.getElementById('sum-seats').innerText = selectedSeats.join(', ') || 'Chưa chọn';
-        let total = 0;
-        let totalFnbItems = 0; 
-
-        selectedSeats.forEach(id => {
-            if(id.startsWith('C')) total += 110000;
-            else if(id.startsWith('D')) total += 250000;
-            else total += 90000;
-        });
-        
-        fnbMenu.forEach(item => {
-            total += (item.qty * item.price);
-            totalFnbItems += item.qty; 
-        });
-        
-        document.getElementById('sum-fnb').innerText = totalFnbItems + " Combo";
-        currentPriceTotal = total;
-        let finalTotal = currentPriceTotal * (1 - appliedVoucherDiscount);
-        document.getElementById('sum-total').innerText = finalTotal.toLocaleString('vi-VN') + " đ";
-    }
-
     function switchCgvTab(panelId, filterType = 'now_showing') {
         if (cgvNavigationHistory[cgvNavigationHistory.length - 1] !== panelId) { cgvNavigationHistory.push(panelId); }
         document.getElementById('bc-back-btn').style.display = (cgvNavigationHistory.length > 1) ? 'inline-block' : 'none';
@@ -1283,34 +1297,33 @@
     }
 
     function generateCgvDateSlider() {
-        const container = document.getElementById('cgv-dynamic-date-slider'); 
-        if(!container) return; 
-        container.innerHTML = '';
+    const container = document.getElementById('cgv-dynamic-date-slider'); 
+    if(!container) return; 
+    container.innerHTML = '';
+    
+    // Ép khối chứa cuộn ngang mượt mà
+    container.style.display = "flex";
+    container.style.gap = "10px";
+    container.style.overflowX = "auto";
+    container.style.paddingBottom = "10px";
+    
+    const daysOfWeek = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+    for (let i = 0; i < 15; i++) {
+        const date = new Date(2026, 5, 8 + i);
+        const dateStr = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`;
+        const bg = (selectedDateStr === dateStr) ? '#111' : '#fff'; 
+        const color = (selectedDateStr === dateStr) ? '#fff' : '#555';
+        const border = (selectedDateStr === dateStr) ? '#111' : '#ccc';
+        if(i===0 && !selectedDateStr) selectedDateStr = dateStr;
         
-        // Ép khối chứa cuộn ngang mượt mà
-        container.style.display = "flex";
-        container.style.gap = "10px";
-        container.style.overflowX = "auto";
-        container.style.paddingBottom = "10px";
-        
-        const daysOfWeek = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-        for (let i = 0; i < 15; i++) {
-            const date = new Date(2026, 5, 8 + i);
-            const dateStr = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`;
-            const bg = (selectedDateStr === dateStr) ? '#111' : '#fff'; 
-            const color = (selectedDateStr === dateStr) ? '#fff' : '#555';
-            const border = (selectedDateStr === dateStr) ? '#111' : '#ccc';
-            if(i===0 && !selectedDateStr) selectedDateStr = dateStr;
-            
-            // Thiết kế thẻ ngày tháng xịn xò
-            container.innerHTML += `
-                <div style="flex: 0 0 auto; min-width: 60px; background:${bg}; color:${color}; border:2px solid ${border}; border-radius:6px; cursor:pointer; text-align:center; padding: 10px 5px; box-sizing: border-box; transition: all 0.2s;" onclick="selectedDateStr='${dateStr}'; generateCgvDateSlider();">
-                    <div style="font-size:11px; margin-bottom: 2px;">${daysOfWeek[date.getDay()]}</div>
-                    <div style="font-size:22px; font-weight:bold; line-height: 1;">${date.getDate().toString().padStart(2,'0')}</div>
-                    <div style="font-size:11px; margin-top: 3px;">Th ${date.getMonth()+1}</div>
-                </div>`;
-        }
+        container.innerHTML += `
+            <div style="flex: 0 0 auto; min-width: 60px; background:${bg}; color:${color}; border:2px solid ${border}; border-radius:6px; cursor:pointer; text-align:center; padding: 10px 5px; box-sizing: border-box; transition: all 0.2s;" onclick="selectedDateStr='${dateStr}'; generateCgvDateSlider();">
+                <div style="font-size:11px; margin-bottom: 2px;">${daysOfWeek[date.getDay()]}</div>
+                <div style="font-size:22px; font-weight:bold; line-height: 1;">${date.getDate().toString().padStart(2,'0')}</div>
+                <div style="font-size:11px; margin-top: 3px;">Th ${date.getMonth()+1}</div>
+            </div>`;
     }
+}
 
     function startCountdown(expiresAt) {
         clearInterval(timerInterval);
@@ -1361,7 +1374,6 @@
     }
 </script>
 
-<!-- MODALS TIỆN ÍCH THANH TOÁN -->
 <div class="cgv-modal-overlay" id="checkout-review-modal">
     <div class="cgv-auth-split-box" style="width: 500px; flex-direction: column; padding: 25px; background: white;">
         <h3 style="border-bottom: 2px solid #222; padding-bottom: 10px; color: #e71a0f;">RÀ SOÁT HÓA ĐƠN</h3>

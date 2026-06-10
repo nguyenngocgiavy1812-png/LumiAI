@@ -241,58 +241,75 @@
             </div>
         </div>
 
+        <!-- PANEL 5: THÀNH VIÊN THEO CHUẨN AUTH CGV -->
         <div id="panel-profile" class="cgv-panel">
             <div class="cgv-profile-layout">
                 
                 <div class="profile-arrow-sidebar">
                     <h2 class="sidebar-main-title">TÀI KHOẢN LAS</h2>
-                    <div class="arrow-menu-list" style="display: flex; flex-wrap: wrap; gap: 4px;">
-                        <button class="arrow-btn active" style="width: 100%;" id="pro-subtab-btn-chung" onclick="switchProfileSubTab('chung')">THÔNG TIN CHUNG</button>
-                        <button class="arrow-btn" style="width: 100%;" id="pro-subtab-btn-chitiet" onclick="switchProfileSubTab('chitiet')">CHI TIẾT TÀI KHOẢN</button>
-                        <button class="arrow-btn" style="width: 100%;" id="pro-subtab-btn-matma" onclick="switchProfileSubTab('matma')">CÀI MẶT MÃ THANH TOÁN</button>
-                        <button class="arrow-btn" style="width: calc(50% - 2px); padding: 10px 5px; text-align: center; font-size: 11px;" id="pro-subtab-btn-the" onclick="switchProfileSubTab('the')">THẺ THÀNH VIÊN</button>
-                        <button class="arrow-btn" style="width: calc(50% - 2px); padding: 10px 5px; text-align: center; font-size: 11px;" id="pro-subtab-btn-diem" onclick="switchProfileSubTab('diem')">ĐIỂM THƯỞNG</button>
-                        <button class="arrow-btn" style="width: 100%;" id="pro-subtab-btn-lichsu" onclick="switchProfileSubTab('lichsu')">LỊCH SỬ GIAO DỊCH</button>
+                    <div class="arrow-menu-list">
+                        <button class="arrow-btn active" id="pro-subtab-btn-chung" onclick="switchProfileSubTab('chung')">THÔNG TIN CHUNG</button>
+                        <button class="arrow-btn" id="pro-subtab-btn-chitiet" onclick="switchProfileSubTab('chitiet')">CHI TIẾT TÀI KHOẢN</button>
+                        <button class="arrow-btn" id="pro-subtab-btn-matma" onclick="switchProfileSubTab('matma')">CÀI MẶT MÃ THANH TOÁN</button>
+                        <button class="arrow-btn" id="pro-subtab-btn-the" onclick="switchProfileSubTab('the')">THẺ THÀNH VIÊN</button>
+                        <button class="arrow-btn" id="pro-subtab-btn-diem" onclick="switchProfileSubTab('diem')">ĐIỂM THƯỞNG</button>
+                        <button class="arrow-btn" id="pro-subtab-btn-lichsu" onclick="switchProfileSubTab('lichsu')">LỊCH SỬ GIAO DỊCH</button>
                     </div>
                 </div>
 
                 <div class="profile-content-display">
                     <div id="pro-panel-chung" class="profile-sub-content active">
                         
-                        <div style="font-size: 16px; color: #333; margin-bottom: 2px;">THÔNG TIN CHUNG</div>
-                        <div style="background: #e71a0f; color: white; padding: 5px 15px; font-size: 28px; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;">
-                            VY
-                        </div>
-                        <button style="background: #e0e0e0; border: 1px solid #999; padding: 2px 10px; font-size: 11px; cursor: pointer; color: #333; margin-bottom: 20px;">Thay đổi</button>
-
-                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px;">
-                            <div style="flex: 1;">
-                                <p style="margin: 0 0 10px 0; font-size: 14px; color: #333;">Barcode</p>
-                                <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: bold; color: #111;">Xin chào Gia Vy,</p>
-                                <p style="margin: 0 0 15px 0; font-size: 14px; color: #333;">Với trang này, bạn sẽ quản lý được tất cả thông tin tài khoản của mình.</p>
-                                <p style="margin: 0 0 10px 0; font-size: 15px; color: #111;">Cấp Độ Thẻ <span style="color:#e5a93b;">★</span> <span style="color:#0066cc; font-weight: bold;">MEMBER</span></p>
-                                <p style="margin: 0 0 10px 0; font-size: 14px; color: #111;">Tổng Chi Tiêu 0 đ</p>
-                                <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: bold; color: #333;">Điểm LAS 0 P</p>
+                        <div class="sub-content-header-title">THÔNG TIN CHUNG</div>
+                        
+                        <div class="profile-top-summary">
+                            <div class="summary-avatar-zone">
+                                <div class="avatar-placeholder-img">VY</div>
+                                <button class="btn-black-action">Thay đổi</button>
                             </div>
-                            <div style="text-align: right; font-size: 12px; color: #555;">
-                                Thẻ thành viên
+                            <div class="summary-barcode-zone">
+                                <div style="font-size: 12px; color: #333; text-align: right;">Thẻ thành viên</div>
+                                <div class="mock-barcode-img">
+                                    <div><div class="line-bar"></div><div class="line-bar thick"></div><div class="line-bar"></div><div class="line-bar thick"></div><div class="line-bar"></div></div>
+                                    <span class="barcode-label">Barcode</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div style="border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px;">
-                            <p style="margin: 0 0 5px 0; font-size: 14px; color: #333;">Thẻ Thành Viên 1 <button style="background: #eee; border: 1px solid #999; padding: 2px 8px; font-size: 11px; cursor: pointer; margin-left: 5px;">Xem</button></p>
-                            <p style="margin: 0; font-size: 14px; color: #333;">Thông tin tài khoản</p>
+                        <div class="welcome-text-line">
+                            <strong style="font-size: 14px;">Xin chào Gia Vy,</strong><br>
+                            Với trang này, bạn sẽ quản lý được tất cả thông tin tài khoản của mình.
                         </div>
 
-                        <div style="font-size: 13px; color: #333; line-height: 1.8;">
-                            <div style="margin-bottom: 5px;">LIÊN HỆ <button style="background: #eee; border: 1px solid #999; padding: 2px 8px; font-size: 11px; cursor: pointer; margin-left: 5px;">Thay đổi</button></div>
-                            <div>Họ và tên <input type="text" value="Nguyễn Ngọc Gia Vy" style="border: 1px solid #777; padding: 4px; font-size: 13px; width: 250px; background: #fff;" readonly></div>
-                            <div>Số điện thoại <input type="text" value="0348340006" style="border: 1px solid #777; padding: 4px; font-size: 13px; width: 250px; background: #fff;" readonly></div>
-                            <div>Địa chỉ Email <input type="text" value="nguyenngocgiavy1812@gmail.com" style="border: 1px solid #777; padding: 4px; font-size: 13px; width: 250px; background: #fff;" readonly></div>
-                            <div>Ngày sinh <input type="text" value="18/12/2006" style="border: 1px solid #777; padding: 4px; font-size: 13px; width: 250px; background: #fff;" readonly></div>
-                            <div>Giới tính <input type="text" value="Nữ" style="border: 1px solid #777; padding: 4px; font-size: 13px; width: 250px; background: #fff;" readonly></div>
+                        <div class="cgv-membership-dashboard-table">
+                            <div class="dashboard-column info-col">
+                                <p><span>Cấp Độ Thẻ</span> <span><span style="color:#e5a93b;">★</span> <span style="color:#0066cc; font-weight: bold;">MEMBER</span></span></p>
+                                <p><span>Tổng Chi Tiêu</span> <span>0 đ</span></p>
+                                <p><span>Điểm LAS</span> <span>0 P</span></p>
+                            </div>
+                            <div class="dashboard-column action-col">
+                                <span style="font-size: 11px; color: #555; text-transform: uppercase;">Thẻ Thành Viên</span>
+                                <span style="font-size: 28px; font-weight: 900; color: #e71a0f;">1</span>
+                                <button class="btn-black-action" style="margin-top: 0;" onclick="switchProfileSubTab('the')">Xem</button>
+                            </div>
                         </div>
 
+                        <div class="account-details-section">
+                            <div style="font-size: 14px; color: #333; margin-bottom: 15px;">Thông tin tài khoản</div>
+                            <div class="details-sub-row">
+                                <span style="font-size: 12px; color: #555; text-transform: uppercase;">LIÊN HỆ</span>
+                                <button class="btn-black-action" style="margin: 0;" onclick="activateEditableFormFields()">Thay đổi</button>
+                            </div>
+                            
+                            <div class="profile-input-forms-grid">
+                                <div class="profile-input-group"><label>Họ và tên</label><input type="text" id="profile-field-name" class="profile-readonly-input" value="Nguyễn Ngọc Gia Vy" readonly></div>
+                                <div class="profile-input-group"><label>Số điện thoại</label><input type="text" id="profile-field-phone" class="profile-readonly-input" value="0348340006" readonly></div>
+                                <div class="profile-input-group"><label>Địa chỉ Email</label><input type="text" id="profile-field-email" class="profile-readonly-input" value="nguyenngocgiavy1812@gmail.com" readonly></div>
+                                <div class="profile-input-group"><label>Ngày sinh</label><input type="text" id="profile-field-birth" class="profile-readonly-input" value="18/12/2006" readonly></div>
+                                <div class="profile-input-group" style="grid-column: span 2;"><label>Giới tính</label><input type="text" id="profile-field-gender" class="profile-readonly-input" value="Nữ" readonly></div>
+                            </div>
+                            <button class="btn-cgv-submit" id="btn-save-profile" style="display: none; width: 100%; margin-top: 25px;" onclick="saveUpdatedProfileInformationData()">LƯU THÔNG TIN KHÁCH HÀNG</button>
+                        </div>
                     </div>
 
                     <div id="pro-panel-chitiet" class="profile-sub-content"><div class="sub-content-header-title">CHI TIẾT TÀI KHOẢN</div><p style="padding: 20px; color:#666;">Cấu hình dữ liệu hồ sơ nâng cao.</p></div>

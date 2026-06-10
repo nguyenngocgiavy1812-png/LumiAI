@@ -243,3 +243,71 @@ header { background-color: var(--cgv-black); border-bottom: 3px solid var(--cgv-
 .cgv-forgot-body label span { color: #e71a0f; }
 .btn-cgv-forgot-submit { background-color: #bc251b; color: white; font-size: 16px; font-weight: bold; text-transform: uppercase; width: 100%; padding: 12px; border: none; border-radius: 3px; cursor: pointer; margin-top: 20px; }
 .cgv-forgot-back-link { display: inline-block; margin-top: 20px; color: #bc251b; text-decoration: none; font-size: 13px; }
+/* --- POPUP QUÊN MẬT KHẨU (PHONG CÁCH CGV CLASSIC) --- */
+.cgv-forgot-box { 
+    background-color: #fdfcf7; /* Màu nền kem */
+    width: 500px; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3); 
+    position: relative; 
+    font-family: Arial, sans-serif; 
+    border-radius: 4px; 
+    overflow: hidden;
+}
+
+.cgv-forgot-header-container {
+    border-bottom: 2px solid #cb352d; /* Đường kẻ ngang chuyển sang màu đỏ */
+    margin: 30px 40px 0 40px; 
+}
+
+.cgv-forgot-header-tab { 
+    background-color: #cb352d; /* Tab đổi sang màu đỏ giống nút Gởi */
+    display: inline-block;
+    padding: 12px 20px; 
+    color: white; 
+    font-size: 18px; 
+    font-weight: bold; 
+    border-radius: 6px 6px 0 0;
+}
+
+.cgv-forgot-body { 
+    padding: 25px 40px 40px 40px; 
+    text-align: left; 
+}
+
+.cgv-forgot-body label { 
+    display: block; 
+    font-weight: bold; 
+    font-size: 14px; 
+    color: #333333; 
+    margin-bottom: 8px; 
+}
+
+.cgv-forgot-body label span { color: #cb352d; } /* Dấu sao màu đỏ */
+
+.btn-cgv-forgot-submit { 
+    background-color: #cb352d; /* Nút bấm đỏ gạch */
+    color: white; 
+    font-size: 16px; 
+    font-weight: bold; 
+    width: 100%; 
+    padding: 14px; 
+    border: none; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    margin-top: 25px; 
+    transition: background 0.2s;
+}
+
+.btn-cgv-forgot-submit:hover {
+    background-color: #a82721;
+}
+
+.cgv-forgot-back-link { 
+    color: #cb352d; 
+    text-decoration: none; 
+    font-size: 14px; 
+}
+
+.cgv-forgot-back-link:hover {
+    text-decoration: underline;
+}

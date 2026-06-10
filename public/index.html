@@ -89,12 +89,10 @@
                 <span class="tab-title-sub" id="tab-title-coming" onclick="switchMovieFilterTab('coming_soon')">PHIM SẮP CHIẾU</span>
             </div>
 
-            <div class="cgv-search-bar-container">
-                <span class="search-title-lbl">Tìm Kiếm Phim Nhanh:</span>
-                <input type="text" id="movie-search-input" class="cgv-search-input" placeholder="Nhập tên phim hoặc thể loại bạn muốn tìm kiếm..." oninput="executeMovieRealTimeSearch()">
-            </div>
-            
-            <div class="cgv-movie-grid-spec" id="cgv-movie-list"></div>
+           <div class="cgv-search-bar-container">
+    <span class="search-title-lbl">Tìm Kiếm Phim Nhanh:</span>
+    <input type="text" id="movie-search-input" class="cgv-search-input" placeholder="Nhập tên phim hoặc thể loại bạn muốn tìm kiếm..." oninput="executeMovieRealTimeSearch()" autocomplete="new-password">
+</div> <div class="cgv-movie-grid-spec" id="cgv-movie-list"></div>
 
             <div style="display: flex; align-items: center; justify-content: center; margin: 50px auto 20px auto; width: 100%;">
                 <div style="flex: 1; height: 2px; background: linear-gradient(to left, #222, transparent);"></div>
@@ -261,7 +259,8 @@
                         
                         <div class="profile-top-summary">
                             <div class="summary-avatar-zone">
-                                <div class="avatar-placeholder-img">VY</div>
+                                
+                                <div class="avatar-placeholder-img" id="profile-avatar">👤</div>
                                 <button class="btn-black-action">Thay đổi</button>
                             </div>
                             <div class="summary-barcode-zone">
@@ -274,7 +273,8 @@
                         </div>
 
                         <div class="welcome-text-line">
-                            <strong style="font-size: 14px;">Xin chào Gia Vy,</strong><br>
+                            <!-- Đã thêm id="profile-greeting" và đổi tên thành Khách -->
+                            <strong style="font-size: 14px;" id="profile-greeting">Xin chào Khách,</strong><br>
                             Với trang này, bạn sẽ quản lý được tất cả thông tin tài khoản của mình.
                         </div>
 
@@ -299,12 +299,12 @@
                             </div>
                             
                             <div class="profile-input-forms-grid">
-                                <div class="profile-input-group"><label>Họ và tên</label><input type="text" id="profile-field-name" class="profile-readonly-input" value="Nguyễn Ngọc Gia Vy" readonly></div>
-                                <div class="profile-input-group"><label>Số điện thoại</label><input type="text" id="profile-field-phone" class="profile-readonly-input" value="0348340006" readonly></div>
-                                <div class="profile-input-group"><label>Địa chỉ Email</label><input type="text" id="profile-field-email" class="profile-readonly-input" value="nguyenngocgiavy1812@gmail.com" readonly></div>
-                                <div class="profile-input-group"><label>Ngày sinh</label><input type="text" id="profile-field-birth" class="profile-readonly-input" value="18/12/2006" readonly></div>
-                                <div class="profile-input-group" style="grid-column: span 2;"><label>Giới tính</label><input type="text" id="profile-field-gender" class="profile-readonly-input" value="Nữ" readonly></div>
-                            </div>
+    <div class="profile-input-group"><label>Họ và tên</label><input type="text" id="profile-field-name" class="profile-readonly-input" value="" readonly></div>
+    <div class="profile-input-group"><label>Số điện thoại</label><input type="text" id="profile-field-phone" class="profile-readonly-input" value="" readonly></div>
+    <div class="profile-input-group"><label>Địa chỉ Email</label><input type="text" id="profile-field-email" class="profile-readonly-input" value="" readonly></div>
+    <div class="profile-input-group"><label>Ngày sinh</label><input type="text" id="profile-field-birth" class="profile-readonly-input" value="" readonly></div>
+    <div class="profile-input-group" style="grid-column: span 2;"><label>Giới tính</label><input type="text" id="profile-field-gender" class="profile-readonly-input" value="" readonly></div>
+</div>
                             <button class="btn-cgv-submit" id="btn-save-profile" style="display: none; width: 100%; margin-top: 25px;" onclick="saveUpdatedProfileInformationData()">LƯU THÔNG TIN KHÁCH HÀNG</button>
                         </div>
                     </div>
@@ -660,11 +660,7 @@
     </div> 
 
     <footer style="background-color: #fdfcf7; border-top: 2px solid #222; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; width: 100%;">
-        <div style="border-bottom: 1px solid #ddd; padding: 15px 0; text-align: center; background: #fff;">
-            <div style="width: 100%; max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-around; font-size: 11px; font-weight: bold; color: #555; flex-wrap: wrap; gap: 10px; padding: 0 20px; box-sizing: border-box;">
-                <span>4DX</span> l <span>IMAX</span> l <span>STARIUM</span> l <span>GOLD CLASS</span> l <span>L'AMOUR</span> l <span>SWEETBOX</span> l <span>PREMIUM CINEMA</span> l <span>SCREENX</span> l <span>CINE & FORÊT</span> l <span>CINE & LIVING ROOM</span> l <span>CINE & SUITE</span>
-            </div>
-        </div>
+       
         
         <div style="width: 100%; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; padding: 40px 20px; box-sizing: border-box; text-align: left; background-color: #fdfcf7;">
             <div>
@@ -732,13 +728,13 @@
                 
                 <div class="cgv-auth-content auth-form-panel active" id="form-login-panel">
                     <div class="cgv-form-group">
-                        <label>Email hoặc số điện thoại</label>
-                        <input type="text" id="auth-username" class="cgv-input-text" placeholder="nguyenngocgiavy1812@gmail.com">
-                    </div>
-                    <div class="cgv-form-group">
-                        <label>Mật khẩu</label>
-                        <input type="password" id="auth-password" class="cgv-input-text" placeholder=".........">
-                    </div>
+    <label>Email hoặc số điện thoại</label>
+    <input type="text" id="auth-username" class="cgv-input-text" placeholder="Nhập email hoặc số điện thoại" autocomplete="off">
+</div>
+<div class="cgv-form-group">
+    <label>Mật khẩu</label>
+    <input type="password" id="auth-password" class="cgv-input-text" placeholder="Nhập mật khẩu" autocomplete="new-password">
+</div>
                     <div class="cgv-form-group">
                         <label>Vui lòng nhập ký tự bên dưới <span>*</span></label>
                         <div class="captcha-row">
@@ -805,26 +801,34 @@
         </div>
     </div>
 
-    <div class="cgv-modal-overlay" id="forgot-modal">
+   <div class="cgv-modal-overlay" id="forgot-modal">
         <div class="cgv-forgot-box">
-            <div class="cgv-forgot-header">Bạn muốn tìm lại mật khẩu?</div>
+            <div class="cgv-forgot-header-container">
+                <div class="cgv-forgot-header-tab">Bạn muốn tìm lại mật khẩu?</div>
+            </div>
+            
             <div class="cgv-forgot-body">
                 <div class="cgv-form-group">
                     <label>Email hoặc số điện thoại <span>*</span></label>
-                    <input type="text" id="forgot-email-input" class="cgv-input-text" style="border: 1px solid #000;" placeholder="Email hoặc số điện thoại">
+                    <input type="text" id="forgot-email-input" class="cgv-input-text" style="border: 1px solid #222;" placeholder="">
                 </div>
+                
                 <div class="cgv-form-group" style="margin-top: 20px;">
                     <label>Vui lòng nhập ký tự bên dưới <span>*</span></label>
                     <div class="captcha-row">
-                        <input type="text" id="forgot-captcha-input" class="cgv-input-text cgv-forgot-captcha-box" style="width: 180px;" placeholder="Nhập ký tự">
-                        <div class="captcha-img-box" style="flex-grow: 1; justify-content: space-between;">
-                            <span class="captcha-text" id="forgot-captcha-text" style="letter-spacing: 3px; font-style: italic;">6IYQVX</span>
-                            <div class="captcha-refresh" onclick="generateForgotCaptcha()">↻</div>
+                        <input type="text" id="forgot-captcha-input" class="cgv-input-text cgv-forgot-captcha-box" style="width: 180px; border: 1px solid #222;" placeholder="">
+                        <div class="captcha-img-box" style="flex-grow: 1; justify-content: space-between; border: 1px solid #ccc; background: #fff;">
+                            <span class="captcha-text" id="forgot-captcha-text" style="letter-spacing: 3px; font-family: 'Times New Roman', serif; font-style: italic; font-size: 26px; color: #111;">PM7MMI</span>
+                            <div class="captcha-refresh" onclick="generateForgotCaptcha()" style="color: #d38b4d; font-size: 24px;">↻</div>
                         </div>
                     </div>
                 </div>
-                <button class="btn-cgv-forgot-submit" onclick="executeForgotRequestSubmit()">GỬI</button>
-                <div><a href="#" class="cgv-forgot-back-link" onclick="closeForgotModal()">&laquo; Quay lại trang đăng nhập</a></div>
+                
+                <button class="btn-cgv-forgot-submit" onclick="executeForgotRequestSubmit()">GỞI </button>
+                
+                <div style="margin-top: 25px;">
+                    <a href="#" class="cgv-forgot-back-link" onclick="closeForgotModal(); openAuthModal(); toggleAuthTab('login');">&laquo; Quay lại trang đăng nhập</a>
+                </div>
             </div>
         </div>
     </div>
@@ -962,7 +966,40 @@
             renderCgvInterface();
         }
     };
+function openForgotModal() {
+        document.getElementById('forgot-modal').classList.add('open');
+        generateForgotCaptcha(); // Sinh mã captcha mới cho form này
+    }
 
+    // Hàm đóng form quên mật khẩu
+    function closeForgotModal() {
+        document.getElementById('forgot-modal').classList.remove('open');
+    }
+
+    // Hàm xử lý khi bấm nút "Gửi yêu cầu"
+    function executeForgotRequestSubmit() {
+        const emailInput = document.getElementById('forgot-email-input').value.trim();
+        const captchaInput = document.getElementById('forgot-captcha-input').value.trim();
+        const currentCaptchaText = document.getElementById('forgot-captcha-text').innerText;
+
+        if (!emailInput) {
+            return alert("Vui lòng nhập địa chỉ email hoặc số điện thoại!");
+        }
+        
+        if (captchaInput.toUpperCase() !== currentCaptchaText.toUpperCase()) {
+            return alert("Mã xác nhận bảo mật không chính xác!");
+        }
+
+        // Mô phỏng gửi yêu cầu thành công
+        alert("Yêu cầu khôi phục mật khẩu đã được gửi đến: " + emailInput + ". Vui lòng kiểm tra hộp thư!");
+        
+        // Đóng form quên mật khẩu và xóa dữ liệu đã nhập
+        document.getElementById('forgot-email-input').value = "";
+        document.getElementById('forgot-captcha-input').value = "";
+        closeForgotModal();
+        openAuthModal();
+        toggleAuthTab('login');
+    }
     function openAuthModal() { document.getElementById('auth-modal').classList.add('open'); generateNewLoginCaptcha(); generateNewRegisterCaptcha(); }
     function closeAuthModal() { document.getElementById('auth-modal').classList.remove('open'); }
     
@@ -1062,31 +1099,81 @@
 
     function closePaymentModal() { document.getElementById('payment-redirect-modal').classList.remove('open'); }
 
-    function executeFinalCheckout() {
-        const currentMovie = document.getElementById('cgv-combo-movie').value;
-        const currentEmail = document.getElementById('profile-field-email') ? document.getElementById('profile-field-email').value : "Hoang2026@gmail.com";
+ function executeFinalCheckout() {
+    const currentMovie = document.getElementById('cgv-combo-movie').value;
+    let currentEmail = "";
 
-        fetch('/api/seats/checkout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ movie: currentMovie, showtime: selectedShowtime, seats: selectedSeats, email: currentEmail })
-        }).then(res => res.json()).then(data => {
-            document.getElementById('payment-redirect-modal').classList.remove('open');
-            if(data.success) {
-                const lasTicketId = data.ticketId.replace('CGV-', 'LAS-');
-                const invoiceObj = {
-                    id: lasTicketId, movie: currentMovie, date: selectedDateStr, time: selectedShowtime,
-                    seats: [...selectedSeats], fnb: fnbMenu.filter(i => i.qty > 0).map(i => ({...i})),
-                    total: currentPriceTotal * (1 - appliedVoucherDiscount), status: 'Đã thanh toán (VNPAY)'
-                };
-                userPastInvoices.unshift(invoiceObj); 
-                
-                alert("Giao dịch thành công! Vé đã được xuất.");
-                resetHoldState(); selectedSeats = []; fnbMenu.forEach(i => i.qty = 0); renderFnbMenu(); calculateCgvCart();
-                renderTransactionHistory(); switchCgvTab('panel-profile'); switchProfileSubTab('lichsu');
-            }
-        });
+    // Kiểm tra nếu đã đăng nhập thì lấy email từ profile, nếu chưa thì hiển thị popup yêu cầu nhập
+    if (isUserLoggedInState) {
+        currentEmail = document.getElementById('profile-field-email').value;
+    } else {
+        currentEmail = prompt("Vui lòng nhập địa chỉ Email để nhận mã vé điện tử:", "");
+        if (!currentEmail) {
+            alert("Bạn cần nhập Email để hoàn tất giao dịch!");
+            return; // Dừng thanh toán nếu không nhập email
+        }
     }
+    
+    fetch('/api/seats/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ movie: currentMovie, showtime: selectedShowtime, seats: selectedSeats, email: currentEmail })
+    }).then(res => res.json()).then(data => {
+        document.getElementById('payment-redirect-modal').classList.remove('open');
+        
+        if(data.success) {
+            const lasTicketId = data.ticketId.replace('CGV-', 'LAS-');
+            const invoiceObj = {
+                id: lasTicketId, movie: currentMovie, date: selectedDateStr, time: selectedShowtime,
+                seats: [...selectedSeats], fnb: fnbMenu.filter(i => i.qty > 0).map(i => ({...i})),
+                total: currentPriceTotal * (1 - appliedVoucherDiscount), status: 'Đã thanh toán (VNPAY)'
+            };
+            userPastInvoices.unshift(invoiceObj); 
+            
+            // Xóa trạng thái giữ ghế và làm mới giỏ hàng
+            resetHoldState(); 
+            selectedSeats = []; 
+            fnbMenu.forEach(i => i.qty = 0); 
+            renderFnbMenu(); 
+            calculateCgvCart();
+            
+            // XỬ LÝ ĐIỀU HƯỚNG VÀ HIỂN THỊ VÉ
+            if (isUserLoggedInState) {
+                // Nếu đã đăng nhập: Thông báo và vào trang Lịch sử giao dịch
+                alert("Giao dịch thành công! Vé đã được xuất.");
+                renderTransactionHistory(); 
+                switchCgvTab('panel-profile'); 
+                switchProfileSubTab('lichsu');
+            } else {
+                // Khách vãng lai: Hiện ngay Popup chứa thông tin vé vừa mua
+                alert("Giao dịch thành công! Vui lòng lưu lại vé bên dưới. Hệ thống cũng đã gửi 1 bản sao vào Email của bạn.");
+                
+                let fnbHtml = invoiceObj.fnb.map(i => `<li>${i.name} x${i.qty}</li>`).join('');
+                
+                // Đổ dữ liệu vé vào Popup
+                document.getElementById('history-detail-content').innerHTML = `
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${invoiceObj.id}" alt="QR Code" style="border: 1px solid #ccc; padding: 5px;">
+                        <p style="color: green; font-weight: bold; font-size: 13px;">Vui lòng chụp màn hình vé này hoặc kiểm tra Email!</p>
+                    </div>
+                    <p><strong>Mã vé:</strong> <span style="color:red;">${invoiceObj.id}</span></p>
+                    <p><strong>Phim:</strong> ${invoiceObj.movie}</p>
+                    <p><strong>Suất:</strong> ${invoiceObj.time} ngày ${invoiceObj.date}</p>
+                    <hr style="margin: 10px 0;">
+                    <p><strong>🎟️ Vé ghế ngồi:</strong> ${invoiceObj.seats.join(', ')}</p>
+                    <p><strong>🍿 Bắp nước:</strong></p>
+                    <ul>${fnbHtml || '<li>Không có</li>'}</ul>
+                    <hr style="margin: 10px 0;">
+                    <p style="font-size: 16px; text-align: right;"><strong>Thành tiền: <span style="color:red;">${invoiceObj.total.toLocaleString('vi-VN')} đ</span></strong></p>
+                `;
+                
+                // Mở Popup lên cho khách xem và đẩy nền về trang chủ
+                document.getElementById('history-detail-modal').classList.add('open');
+                switchCgvTab('panel-movies', 'now_showing');
+            }
+        }
+    });
+}
 
     function cancelCurrentTransaction() {
         if(confirm("Bạn có chắc chắn muốn hủy giao dịch và bỏ giữ các ghế này không?")) {
@@ -1171,28 +1258,35 @@
     }
 
     function submitCgvLogin() {
-        const user = document.getElementById('auth-username').value.trim();
-        const pass = document.getElementById('auth-password').value;
-        const captchaInput = document.getElementById('login-captcha').value.trim();
-        const currentLoginCaptcha = document.getElementById('login-captcha-text').innerText;
+    const user = document.getElementById('auth-username').value.trim();
+    const pass = document.getElementById('auth-password').value;
+    const captchaInput = document.getElementById('login-captcha').value.trim();
+    const currentLoginCaptcha = document.getElementById('login-captcha-text').innerText;
 
-        if(!user || !pass) return alert('Vui lòng nhập đầy đủ tài khoản và mật khẩu!');
-        if(captchaInput.toUpperCase() !== currentLoginCaptcha.toUpperCase()) return alert('Mã bảo vệ Captcha không chính xác!');
-        if(user !== "nguyenngocgiavy1812@gmail.com" || pass !== "123456") return alert('Tài khoản hoặc mật khẩu không đúng!');
-        
-        isUserLoggedInState = true;
-        alert(`Chào mừng thành viên: Gia Vy đăng nhập thành công!`);
-        closeAuthModal();
+    if(!user || !pass) return alert('Vui lòng nhập đầy đủ tài khoản và mật khẩu!');
+    if(captchaInput.toUpperCase() !== currentLoginCaptcha.toUpperCase()) return alert('Mã bảo vệ Captcha không chính xác!');
+    if(user !== "nguyenngocgiavy1812@gmail.com" || pass !== "123456") return alert('Tài khoản hoặc mật khẩu không đúng!');
+    
+    isUserLoggedInState = true;
+    alert(`Chào mừng thành viên: Gia Vy đăng nhập thành công!`);
+    closeAuthModal();
 
-        const authLinkBox = document.getElementById('top-bar-auth-link');
-        authLinkBox.removeAttribute('onclick');
-        authLinkBox.innerHTML = `
-            <span class="sub-nav-icon">👤</span> XIN CHÀO, GIA VY! 
-            <span onclick="handleCgvLogout(event)" style="color: #0066cc; margin-left: 8px; cursor: pointer; text-decoration: underline; font-weight: bold;">THOÁT</span>
-        `;
-        document.getElementById('top-bar-ticket-link').innerHTML = `<span class="sub-nav-icon">🎬</span> LỊCH SỬ GIAO DỊCH`;
-        switchCgvTab('panel-profile');
-    }
+    // Bổ sung code: Đổ dữ liệu vào DOM sau khi đăng nhập thành công
+    document.getElementById('profile-field-name').value = "Nguyễn Ngọc Gia Vy";
+    document.getElementById('profile-field-phone').value = "0348340006";
+    document.getElementById('profile-field-email').value = "nguyenngocgiavy1812@gmail.com";
+    document.getElementById('profile-field-birth').value = "18/12/2006";
+    document.getElementById('profile-field-gender').value = "Nữ";
+
+    const authLinkBox = document.getElementById('top-bar-auth-link');
+    authLinkBox.removeAttribute('onclick');
+    authLinkBox.innerHTML = `
+        <span class="sub-nav-icon">👤</span> XIN CHÀO, GIA VY! 
+        <span onclick="handleCgvLogout(event)" style="color: #0066cc; margin-left: 8px; cursor: pointer; text-decoration: underline; font-weight: bold;">THOÁT</span>
+    `;
+    document.getElementById('top-bar-ticket-link').innerHTML = `<span class="sub-nav-icon">🎬</span> LỊCH SỬ GIAO DỊCH`;
+    switchCgvTab('panel-profile');
+}
 
     function submitCgvRegister() {
         const name = document.getElementById('reg-name').value.trim();

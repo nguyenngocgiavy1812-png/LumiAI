@@ -17,7 +17,7 @@ body { background-color: var(--cgv-gray-bg); color: var(--text-dark); font-famil
 
 /* --- HEADER & NAV --- */
 header { background-color: var(--cgv-black); border-bottom: 3px solid var(--cgv-gold); position: sticky; top: 0; z-index: 1000; }
-.header-container { width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+.header-container { width: 100%; max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; box-sizing: border-box;}
 .logo { font-size: 32px; font-weight: 900; color: var(--cgv-red); letter-spacing: -1px; cursor: pointer; padding: 15px 0; }
 .logo span { color: var(--text-light); font-size: 14px; font-weight: normal; letter-spacing: 2px; margin-left: 5px; }
 .nav-menu { display: flex; height: 100%; }
@@ -29,17 +29,16 @@ header { background-color: var(--cgv-black); border-bottom: 3px solid var(--cgv-
 .nav-item-wrapper:hover .dropdown-menu { display: block; }
 .dropdown-item { display: block; padding: 12px 15px; color: var(--text-light); text-decoration: none; font-size: 14px; font-weight: bold; border-bottom: 1px solid #444444; }
 .dropdown-item:hover { background-color: rgba(0, 0, 0, 0.4); color: var(--cgv-gold); padding-left: 20px; }
-
 .cgv-red-line { width: 100%; height: 4px; background-color: var(--cgv-red); background-image: linear-gradient(to right, transparent 50%, rgba(255,255,255,0.4) 50%); background-size: 6px 100%; }
 
-.main-wrapper { width: 1100px; margin: 30px auto; background: white; box-shadow: 0 0 15px rgba(0,0,0,0.05); border: 1px solid var(--border-color); border-top: 5px solid var(--cgv-black); min-height: 600px; padding: 25px; box-sizing: border-box; }
-.section-title { font-size: 20px; text-transform: uppercase; border-bottom: 2px solid var(--cgv-black); padding-bottom: 8px; margin-bottom: 20px; color: var(--cgv-black); font-weight: bold; display: flex; justify-content: space-between; }
+/* --- BỐ CỤC CHÍNH --- */
+.global-viewport-container { width: 100%; max-width: 100% !important; margin: 0 auto; background-color: #ffffff; box-sizing: border-box; }
+.main-wrapper { width: 100% !important; max-width: 1200px !important; margin: 20px auto !important; padding: 25px !important; background: white; border: 1px solid var(--border-color); border-top: 5px solid var(--cgv-black); box-sizing: border-box; }
 
 /* --- TOP UTIL BAR --- */
-.cgv-top-utility-wrapper { width: 100%; background-color: #fdfcf7; }
-.cgv-top-banner-promo { width: 100%; border-top: 3px solid #5d2d91; }
-.cgv-top-sub-nav { width: 100%; background-color: #fdfcf7; border-bottom: 1px solid #ddd; padding: 6px 0; }
-.sub-nav-container { width: 1100px; margin: 0 auto; display: flex; justify-content: flex-end; padding: 0 25px; box-sizing: border-box; }
+.cgv-top-utility-wrapper { width: 100%; background-color: #fdfcf7; border-top: 3px solid var(--cgv-red); }
+.cgv-top-sub-nav { width: 100%; border-bottom: 1px solid #ddd; padding: 6px 0; }
+.sub-nav-container { width: 100%; max-width: 1200px; margin: 0 auto; display: flex; justify-content: flex-end; padding: 0 20px; box-sizing: border-box; }
 .sub-nav-links-right { display: flex; align-items: center; gap: 20px; }
 .sub-nav-item { color: #555; text-decoration: none; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 4px; cursor: pointer; }
 .sub-nav-item:hover { color: var(--cgv-red); }
@@ -48,15 +47,40 @@ header { background-color: var(--cgv-black); border-bottom: 3px solid var(--cgv-
 .lang-btn.lang-vn { background-color: #e71a0f; color: white; }
 .lang-btn.lang-en { background-color: #ccc; color: #333; }
 
-/* --- GRID TIN MỚI & ƯU ĐÃI --- */
-.news-filter-header-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; border-bottom: 1px dashed #ccc; padding-bottom: 15px; }
-.news-filter-btn { background-color: #999; color: white; border: none; padding: 8px 25px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 13px; }
-.news-filter-btn.active { background-color: var(--cgv-red); }
+.las-sub-icon-menu-bar { display: flex; justify-content: space-around; background: #ffffff; border: 1px solid #eeeeee; border-bottom: 2px solid #111111; padding: 15px 10px; margin: 15px auto; width: 100%; max-width: 1200px; box-sizing: border-box; }
+.icon-menu-item { display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 11px; font-weight: bold; color: #333; cursor: pointer; text-decoration: none; }
+.icon-menu-item .icon-circle { width: 45px; height: 45px; background: #e71a0f; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+
+/* --- KHU VỰC TRANG CHỦ & PHIM --- */
+.cgv-breadcrumb-bar { text-align: left; font-size: 13px; color: #666; margin-bottom: 20px; }
+.cgv-movie-tab-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #222; padding-bottom: 8px; margin-bottom: 25px; }
+.tab-title-main { font-size: 36px; color: #222; margin: 0; cursor: pointer; }
+.tab-title-sub { font-size: 18px; color: #777; font-weight: bold; cursor: pointer; padding-bottom: 4px; }
+.cgv-search-bar-container { display: flex; align-items: center; justify-content: space-between; background: #f9f9f9; border: 1px solid #ddd; padding: 12px 20px; margin-bottom: 25px; gap: 15px; width: 100%; box-sizing: border-box;}
+.cgv-search-input { flex-grow: 1; padding: 8px 15px; border: 1px solid #777; border-radius: 4px; box-sizing: border-box; }
+.search-title-lbl { font-size: 14px; font-weight: bold; color: #333; text-transform: uppercase; }
+
+.cgv-movie-grid-spec { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 25px !important; width: 100% !important; box-sizing: border-box !important; }
+.movie-spec-card { display: flex !important; flex-direction: column !important; width: 100% !important; }
+.poster-wrapper-box { position: relative !important; width: 100% !important; height: 310px !important; border: 3px solid #000 !important; box-sizing: border-box !important; }
+.poster-main-body-img { width: 100%; height: 100%; background-color: #111; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer;}
+.poster-main-body-img img { width: 100%; height: 100%; object-fit: cover; }
+.age-label-badge { position: absolute; top: 10px; left: 10px; background-color: #ff5722; color: white; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 3px; z-index: 2;}
+.rank-ribbon { position: absolute; top: -5px; right: 10px; width: 26px; height: 26px; border-radius: 50%; color: white; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 2;}
+.ribbon-red { background-color: #d32f2f; }
+.ribbon-orange { background-color: #f57c00; }
+.ribbon-blue { background-color: #1976d2; }
+.movie-spec-info-text { text-align: left; margin-top: 12px; flex-grow: 1; }
+.movie-spec-title { font-size: 14px; font-weight: bold; color: #111; margin: 0 0 8px 0; text-transform: uppercase; line-height: 1.4; height: 38px; overflow: hidden; cursor: pointer; }
+.movie-spec-info-text p { margin: 4px 0; font-size: 13px; color: #333; }
+.btn-cgv-buy-ticket-spec { background-color: #e71a0f; color: white; border: none; padding: 8px 25px; font-size: 13px; font-weight: bold; border-radius: 4px; cursor: pointer; display: inline-block; margin-top: 10px; transition: background-color 0.2s;}
+.btn-cgv-buy-ticket-spec:hover { background-color: #b31010; }
+
 .news-grid-layout { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 15px; }
 .news-promo-card { background: white; border: 1px solid #e2e2e2; padding: 10px; box-shadow: 0 3px 6px rgba(0,0,0,0.03); text-align: left; }
 .news-card-img-holder { width: 100%; height: 220px; background-color: #eaeaea; border-radius: 3px; margin-bottom: 10px; }
 .news-card-date { font-size: 11px; color: #b31010; font-weight: bold; margin-bottom: 5px; }
-.news-card-title-text { font-size: 12px; font-weight: bold; color: #222; line-height: 1.4; height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.news-card-title-text { font-size: 12px; font-weight: bold; color: #222; line-height: 1.4; height: 36px; overflow: hidden; }
 
 /* --- RẠP PHÒNG & GHẾ ĐẶT VÉ (CHUẨN 2 CỘT) --- */
 .las-step-bar-container { display: flex; justify-content: space-around; background: #111111; padding: 15px 0; border-radius: 6px; margin-bottom: 25px; color: #ffffff; width: 100%; box-sizing: border-box; }
@@ -79,16 +103,16 @@ header { background-color: var(--cgv-black); border-bottom: 3px solid var(--cgv-
 .cgv-date-slider-container::-webkit-scrollbar-thumb { background: #cccccc; border-radius: 2px; }
 
 .cinema-room { background: #111111; padding: 40px 20px; border-radius: 5px; color: white; text-align: center; margin-bottom: 30px; width: 100%; box-sizing: border-box; overflow-x: auto; }
-.screen-curve { width: 70%; height: 20px; border-top: 3px solid var(--cgv-gold); border-radius: 50% / 10px 10px 0 0; margin: 0 auto 40px auto; }
-.screen-text { color: var(--cgv-gold); font-size: 12px; text-transform: uppercase; letter-spacing: 5px; margin-top: -30px; margin-bottom: 40px; }
+.screen-curve { width: 70%; height: 20px; border-top: 3px solid #e5a93b; border-radius: 50% / 10px 10px 0 0; margin: 0 auto 40px auto; }
+.screen-text { color: #e5a93b; font-size: 12px; text-transform: uppercase; letter-spacing: 5px; margin-top: -30px; margin-bottom: 40px; }
 .seat-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 auto 25px auto; max-width: 450px; }
 .cgv-seat { width: 35px; height: 35px; font-size: 11px; font-weight: bold; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; user-select: none; }
 .cgv-seat.Standard { background-color: #666; color: white; }
 .cgv-seat.VIP { background-color: #b31010; color: white; }
 .cgv-seat.Sweetbox { background-color: #e25b8b; color: white; }
-.cgv-seat.holding { background-color: var(--cgv-gold) !important; color: black !important; }
+.cgv-seat.holding { background-color: #e5a93b !important; color: black !important; }
 .cgv-seat.sold { background-color: #333 !important; color: #555 !important; cursor: not-allowed; }
-.cgv-seat.selected { background-color: var(--cgv-red) !important; color: white !important; box-shadow: 0 0 8px var(--cgv-red); }
+.cgv-seat.selected { background-color: #e71a0f !important; color: white !important; box-shadow: 0 0 8px #e71a0f; }
 .seat-legend { display: flex; justify-content: center; gap: 20px; font-size: 12px; color: #aaa; margin-top: 15px; }
 .legend-item { display: flex; align-items: center; gap: 5px; }
 .legend-box { width: 15px; height: 15px; border-radius: 3px; }
@@ -97,10 +121,15 @@ header { background-color: var(--cgv-black); border-bottom: 3px solid var(--cgv-
 .invoice-info-card { background: #111111; color: #ffffff; border-radius: 8px; padding: 25px; text-align: left; border-top: 5px solid #e71a0f; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 .invoice-total-card { background: #ffffff; border: 2px solid #111111; border-radius: 8px; padding: 20px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 .action-flow-buttons-row { display: flex; gap: 15px; }
-.btn-flow-back { background: #ffffff; color: #111111; border: 2px solid #111111; border-radius: 6px; padding: 15px; font-size: 16px; font-weight: bold; cursor: pointer; width: 70px; }
-.btn-flow-next { background: #e71a0f; color: #ffffff; border: none; border-radius: 6px; padding: 15px; font-size: 16px; font-weight: bold; cursor: pointer; flex-grow: 1; text-transform: uppercase; }
+.btn-flow-back { background: #ffffff; color: #111111; border: 2px solid #111111; border-radius: 6px; padding: 15px; font-size: 16px; font-weight: bold; cursor: pointer; width: 70px; transition: all 0.2s;}
+.btn-flow-back:hover { background: #eeeeee; }
+.btn-flow-next { background: #e71a0f; color: #ffffff; border: none; border-radius: 6px; padding: 15px; font-size: 16px; font-weight: bold; cursor: pointer; flex-grow: 1; text-transform: uppercase; transition: all 0.2s;}
+.btn-flow-next:hover { background: #b31010; }
 
-/* --- TÀI KHOẢN & THÀNH VIÊN (TRANG CHỈN CHU, SẠCH ĐẸP) --- */
+/* --- TÀI KHOẢN & THÀNH VIÊN --- */
+/* ==========================================================================
+   TÀI KHOẢN & THÀNH VIÊN (GIAO DIỆN PROFESSIONAL)
+   ========================================================================== */
 .cgv-profile-layout { display: flex; gap: 30px; background-color: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #eee; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
 .profile-arrow-sidebar { flex: 1; display: flex; flex-direction: column; border-right: 1px solid #eee; padding-right: 20px; }
 .sidebar-main-title { color: #e71a0f; font-size: 22px; font-weight: 900; margin-top: 0; margin-bottom: 20px; text-align: left; text-transform: uppercase; border-bottom: 2px solid #111; padding-bottom: 10px; }
@@ -151,10 +180,7 @@ header { background-color: var(--cgv-black); border-bottom: 3px solid var(--cgv-
 .profile-readonly-input:focus { outline: none; }
 .btn-save-profile-data-action { background-color: #10B981; color: white; border: none; padding: 15px; width: 100%; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 20px; border-radius: 4px; box-shadow: 0 4px 6px rgba(16,185,129,0.2); transition: background 0.2s; }
 .btn-save-profile-data-action:hover { background-color: #059669; }
-
-/* ==========================================================================
-   MODAL & FORM ĐĂNG NHẬP / ĐĂNG KÝ (ĐÚNG MẪU ẢNH - NỀN KEM - TAB ĐỎ)
-   ========================================================================== */
+/* --- MODAL ĐĂNG NHẬP / ĐĂNG KÝ (CHUẨN ẢNH NỀN KEM) --- */
 .cgv-panel { display: none; }
 .cgv-panel.active { display: block; }
 .section-title { font-size: 16px; font-weight: bold; text-transform: uppercase; border-left: 4px solid #e71a0f; padding-left: 10px; margin: 25px 0 15px 0; color: #111; text-align: left; }
@@ -216,10 +242,8 @@ header { background-color: var(--cgv-black); border-bottom: 3px solid var(--cgv-
 .dot { width: 8px; height: 8px; background-color: #ccc; border-radius: 50%; }
 .dot.active { background-color: #e71a0f; }
 
-/* ==========================================================================
-   POPUP QUÊN MẬT KHẨU
-   ========================================================================== */
-.cgv-forgot-box { background-color: #fdfcf7; width: 550px; border: 1px solid #cccccc; box-shadow: 0 8px 20px rgba(0,0,0,0.3); position: relative; font-family: Arial, sans-serif; }
+/* --- POPUP QUÊN MẬT KHẨU --- */
+.cgv-forgot-box { background-color: #fdfcf7; width: 550px; border: 1px solid #cccccc; box-shadow: 0 8px 20px rgba(0,0,0,0.3); position: relative; font-family: Arial, sans-serif; border-radius: 4px; overflow: hidden;}
 .cgv-forgot-header { background-color: #8c8c8c; padding: 14px 20px; color: white; font-size: 18px; font-weight: bold; text-align: left; }
 .cgv-forgot-body { padding: 30px 40px; text-align: left; }
 .cgv-forgot-body label { display: block; font-weight: bold; font-size: 14px; color: #333333; margin-bottom: 8px; }

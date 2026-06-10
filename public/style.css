@@ -311,3 +311,104 @@ header { background-color: var(--cgv-black); border-bottom: 3px solid var(--cgv-
 .cgv-forgot-back-link:hover {
     text-decoration: underline;
 }
+/* --- KHU VỰC CHỌN PHƯƠNG THỨC THANH TOÁN --- */
+.payment-selection-block {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #ffffff;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.payment-selection-title {
+    background-color: #f8fafc;
+    padding: 10px 15px;
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: bold;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.payment-selection-body {
+    padding: 12px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.payment-option-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 12px;
+}
+
+.payment-option-row:hover {
+    background-color: #f8fafc;
+}
+
+/* Khi hình thức thanh toán được chọn */
+.payment-option-row.active {
+    border-color: #cbd5e1;
+    background-color: #f1f5f9;
+}
+
+/* Vòng tròn tích chọn phía trước */
+.option-check-circle {
+    width: 18px;
+    height: 18px;
+    border: 1px solid #cbd5e1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: transparent;
+    box-sizing: border-box;
+}
+
+.payment-option-row.active .option-check-circle {
+    border-color: #cb352d;
+    color: #cb352d;
+    font-weight: bold;
+}
+
+/* Tạo Icon đại diện thương hiệu */
+.method-badge-icon {
+    width: 34px;
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 11px;
+    color: white;
+    user-select: none;
+    box-sizing: border-box;
+}
+.badge-mv { background-color: #b93c26; font-size: 12px; }
+.badge-apple { background-color: #000000; font-size: 10px; }
+.badge-momo { background-color: #a50064; font-size: 9px; text-transform: lowercase; }
+.badge-payoo { background-color: #2b78c9; font-size: 9px; }
+
+.method-info-texts {
+    text-align: left;
+}
+
+.method-main-name {
+    font-size: 13.5px;
+    font-weight: bold;
+    color: #1e293b;
+}
+
+.method-sub-desc {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 2px;
+}

@@ -60,8 +60,46 @@
         <div class="icon-menu-item" onclick="openAuthModal()"><div class="icon-circle">👤</div><span>HỘI VIÊN LAS</span></div>
     </div>
 
-    <div class="main-wrapper">
+   <div class="main-wrapper">
+    <div id="panel-admin-dashboard" class="cgv-panel" style="display: none; padding: 20px; background: #fff; border: 1px solid #ddd;">
         
+        <div style="border-bottom: 2px solid #e71a0f; padding-bottom: 10px; margin-bottom: 15px;">
+            <h2 style="color: #e71a0f; margin: 0;">🛡️ BẢNG ĐIỀU KHIỂN QUẢN LÝ (MANAGER DASHBOARD)</h2> 
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+            <div style="background: #f4f2ec; padding: 20px; border-radius: 4px; text-align: center;">
+                <h3>🎬 Quản Lý Phim</h3>
+                <button style="background:#111; color:#fff; border:none; padding:10px 15px; cursor:pointer;">Thêm Phim Mới</button>
+            </div>
+            <div style="background: #f4f2ec; padding: 20px; border-radius: 4px; text-align: center;">
+                <h3>📊 Doanh Thu</h3>
+                <p style="font-size:24px; font-weight:bold; color:green;">15,400,000 đ</p>
+            </div>
+            <div style="background: #f4f2ec; padding: 20px; border-radius: 4px; text-align: center;">
+                <h3>👥 Người Dùng</h3>
+                <button style="background:#111; color:#fff; border:none; padding:10px 15px; cursor:pointer;">Phân Quyền Nhân Viên</button>
+            </div>
+        </div>
+
+    </div> </div>
+
+<div id="panel-staff-dashboard" class="cgv-panel" style="display: none; padding: 20px; background: #fff; border: 1px solid #ddd;">
+    <div style="border-bottom: 2px solid #0066cc; padding-bottom: 10px; margin-bottom: 15px;">
+        <h2 style="color: #0066cc; margin: 0;">📋 HỆ THỐNG TÁC VỤ NHÂN VIÊN (STAFF PANEL)</h2>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div style="background: #eef6ff; padding: 20px; border-radius: 4px; text-align: center;">
+            <h3>🎟️ Quét Mã Soát Vé Khách Hàng</h3>
+            <input type="text" placeholder="Nhập mã vé (Ví dụ: LAS-12345)..." style="padding: 10px; width: 70%; margin-bottom: 10px;"><br>
+            <button style="background:#0066cc; color:#fff; border:none; padding:10px 20px; cursor:pointer; font-weight:bold;">XÁC NHẬN VÉ</button>
+        </div>
+        <div style="background: #eef6ff; padding: 20px; border-radius: 4px; text-align: center;">
+            <h3>🍿 Quầy Concession (Bắp Nước)</h3>
+            <button style="background:#111; color:#fff; border:none; padding:10px 20px; cursor:pointer;">Xuất Combo Khách Đặt</button>
+        </div>
+    </div>
+</div>
         <div id="panel-movies" class="cgv-panel active">
             <div class="cgv-breadcrumb-bar" style="display: flex; align-items: center; gap: 5px;">
                 <span class="bc-link" onclick="handleBreadcrumbBack()" style="cursor: pointer; font-weight: bold; color: #e71a0f; margin-right: 10px; display: none;" id="bc-back-btn">⬅ Trở lại</span>
@@ -867,29 +905,46 @@
                 </div>
                 
                 <div class="cgv-auth-content auth-form-panel active" id="form-login-panel">
-                    <div class="cgv-form-group">
-                        <label>Email hoặc số điện thoại</label>
-                        <input type="text" id="auth-username" class="cgv-input-text" placeholder="Nhập email hoặc số điện thoại" autocomplete="off">
-                    </div>
-                    <div class="cgv-form-group">
-                        <label>Mật khẩu</label>
-                        <input type="password" id="auth-password" class="cgv-input-text" placeholder="Nhập mật khẩu" autocomplete="new-password">
-                    </div>
-                    <div class="cgv-form-group">
-                        <label>Vui lòng nhập ký tự bên dưới <span>*</span></label>
-                        <div class="captcha-row">
-                            <input type="text" class="cgv-input-text captcha-input" id="login-captcha">
-                            <div class="captcha-img-box">
-                                <span class="captcha-text" id="login-captcha-text">IXBLT1</span>
-                                <div class="captcha-refresh" onclick="generateNewLoginCaptcha()">↻</div>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn-cgv-submit" onclick="submitCgvLogin()">ĐĂNG NHẬP</button>
-                    <div class="cgv-auth-footer">
-                        <a href="#" onclick="openForgotModal(); closeAuthModal();">Bạn muốn tìm lại mật khẩu?</a>
-                    </div>
-                </div>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="font-family: 'Impact', sans-serif; color: #e71a0f; letter-spacing: 1px; margin: 0;">LAS CINEMAS LOGIN</h2>
+        <p style="font-size: 12px; color: #666; margin: 5px 0 0 0;">Dành cho Hội viên, Nhân viên và Quản trị viên</p>
+    </div>
+
+    <div class="cgv-form-group" style="margin-bottom: 15px;">
+        <label style="font-weight: bold; font-size: 13px; color: #333; display: block; margin-bottom: 5px;">Tài khoản Hệ thống <span>*</span></label>
+        <input type="text" id="auth-username" class="cgv-input-text" placeholder="Nhập Email hoặc Số điện thoại đăng ký..." autocomplete="off" 
+               style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px;">
+    </div>
+
+    <div class="cgv-form-group" style="margin-bottom: 15px;">
+        <label style="font-weight: bold; font-size: 13px; color: #333; display: block; margin-bottom: 5px;">Mật khẩu mật mã <span>*</span></label>
+        <div style="position: relative;">
+            <input type="password" id="auth-password" class="cgv-input-text" placeholder="Nhập mật khẩu an toàn..." autocomplete="new-password"
+                   style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px;">
+        </div>
+    </div>
+
+    <div class="cgv-form-group" style="margin-bottom: 20px;">
+        <label style="font-weight: bold; font-size: 13px; color: #333; display: block; margin-bottom: 5px;">Xác thực mã bảo vệ Captcha <span>*</span></label>
+        <div class="captcha-row" style="display: flex; gap: 10px; align-items: center;">
+            <input type="text" class="cgv-input-text captcha-input" id="login-captcha" placeholder="Nhập ký tự..." 
+                   style="width: 50%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; text-transform: uppercase;">
+            <div class="captcha-img-box" style="display: flex; align-items: center; justify-content: space-between; border: 1px solid #ccc; background: #f4f2ec; padding: 5px 10px; border-radius: 4px; flex-grow: 1; height: 38px; box-sizing: border-box;">
+                <span class="captcha-text" id="login-captcha-text" style="letter-spacing: 3px; font-family: 'Georgia', serif; font-weight: bold; font-style: italic; font-size: 20px; color: #111; user-select: none;">IXBLT1</span>
+                <div class="captcha-refresh" onclick="generateNewLoginCaptcha()" style="color: #e71a0f; font-size: 20px; cursor: pointer; user-select: none; font-weight: bold;">↻</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-cgv-submit" onclick="submitCgvLogin(event)" 
+            style="width: 100%; background: #e71a0f; color: white; border: none; padding: 12px; font-size: 15px; font-weight: bold; cursor: pointer; border-radius: 4px; box-shadow: 0 4px 6px rgba(231,26,15,0.2); transition: all 0.2s;">
+        ĐĂNG NHẬP VÀO HỆ THỐNG
+    </button>
+
+    <div class="cgv-auth-footer" style="margin-top: 15px; text-align: center; font-size: 13px;">
+        <a href="#" onclick="openForgotModal(); closeAuthModal();" style="color: #0066cc; text-decoration: none;">Bạn muốn tìm lại mật khẩu bảo mật?</a>
+    </div>
+</div>
 
                 <div class="cgv-auth-content auth-form-panel" id="form-register-panel">
                     <div class="scrollable-register-form">
@@ -923,7 +978,7 @@
                             <label class="check-item"><input type="checkbox" class="reg-policy"> <span>Thông tin cá nhân cung cấp tại đây là chính xác và trùng khớp với thông tin tại CMND/CCCD/Thẻ Căn cước và/hoặc Giấy khai sinh.</span></label>
                             <label class="check-item"><input type="checkbox" class="reg-policy"> <span>Tôi đồng ý với <b>Điều Khoản Sử Dụng Của CGV</b></span></label>
                         </div>
-                        <button class="btn-cgv-submit" style="margin-top: 20px;" onclick="submitCgvRegister()">ĐĂNG KÝ</button>
+                       <button class="btn-cgv-submit" style="margin-top: 20px;" onclick="submitCgvRegister(event)">ĐĂNG KÝ</button>
                     </div>
                 </div>
             </div>
@@ -1578,67 +1633,270 @@ document.getElementById('bank-qr-img').src = `https://img.vietqr.io/image/${bank
         if (!isUserLoggedInState) { alert("Vui lòng đăng nhập hệ thống!"); openAuthModal(); } 
         else { switchCgvTab('panel-profile'); }
     }
+function submitCgvLogin(event) {
+    if (event) {
+        event.preventDefault(); // Ngăn chặn hành vi mặc định gây reload trang của form HTML
+    }
 
-    function submitCgvLogin() {
+    // 1. Lấy dữ liệu từ các ô Input trên giao diện
     const user = document.getElementById('auth-username').value.trim();
     const pass = document.getElementById('auth-password').value;
     const captchaInput = document.getElementById('login-captcha').value.trim();
     const currentLoginCaptcha = document.getElementById('login-captcha-text').innerText;
 
-    if(!user || !pass) return alert('Vui lòng nhập đầy đủ tài khoản và mật khẩu!');
-    if(captchaInput.toUpperCase() !== currentLoginCaptcha.toUpperCase()) return alert('Mã bảo vệ Captcha không chính xác!');
-    if(user !== "nguyenngocgiavy1812@gmail.com" || pass !== "123456") return alert('Tài khoản hoặc mật khẩu không đúng!');
+    // 2. Kiểm tra tính hợp lệ của dữ liệu thô đầu vào (Validation)
+    if (!user || !pass) {
+        return alert('Vui lòng nhập đầy đủ tài khoản và mật khẩu đăng nhập!');
+    }
+    if (!captchaInput) {
+        return alert('Vui lòng nhập mã bảo vệ Captcha!');
+    }
+    if (captchaInput.toUpperCase() !== currentLoginCaptcha.toUpperCase()) {
+        alert('Mã bảo vệ Captcha nhập vào không chính xác!');
+        generateNewLoginCaptcha(); // Tự động đổi mã Captcha mới khi gõ sai
+        document.getElementById('login-captcha').value = ""; // Xóa trắng ô nhập mã
+        return;
+    }
+
+    // 3. Thực hiện gọi API kết nối đồng bộ đến Server Spring Boot
+    fetch('http://localhost:8080/api/login/login', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify({ 
+            identifier: user, 
+            password: pass 
+        })
+    })
+    .then(res => {
+        // Nếu sai mật khẩu hoặc tài khoản không tồn tại, Spring Boot trả về lỗi 401 Unauthorized
+        if (!res.ok && res.status !== 401) {
+            throw new Error("Không thể kết nối đến hệ thống Server Backend!");
+        }
+        return res.json();
+    })
+    .then(response => {
+        if (response.status === 'success') {
+            isUserLoggedInState = true;
+            const userData = response.data;
+            
+            // Lưu trữ thông tin phiên làm việc vào bộ nhớ trình duyệt (Duy trì khi chuyển tab/F5)
+            sessionStorage.setItem('userRoleId', userData.roleId);
+            sessionStorage.setItem('userFullName', userData.fullName);
+            sessionStorage.setItem('userEmail', userData.email);
+
+            // Đóng khung Modal popup Đăng nhập/Đăng ký lại
+            closeAuthModal();
+
+            // Lấy mã quyền hạn (Ép kiểu về số nguyên để so sánh chính xác)
+            const userRole = parseInt(userData.roleId);
+
+            // Ẩn toàn bộ các panel giao diện cũ trước khi phân phối quyền mới
+            document.querySelectorAll('.cgv-panel').forEach(panel => {
+                panel.classList.remove('active');
+                panel.style.display = 'none';
+            });
+
+            // 4. LẬP LUỒNG PHÂN QUYỀN ĐIỀU HƯỚNG GIAO DIỆN (ROLE-BASED REDIRECTION)
+            if (userRole === 1) {
+              // --- 🛡️ VAI TRÒ 1: QUẢN LÝ (MANAGER) ---
+    alert(`[QUẢN LÝ HỆ THỐNG] Xác thực thành công! Xin chào Manager: ${userData.fullName}.`); // ✏️ Đổi chữ ở đây
     
-    isUserLoggedInState = true;
-    alert(`Chào mừng thành viên: Gia Vy đăng nhập thành công!`);
-    closeAuthModal();
+    const adminPanel = document.getElementById('panel-admin-dashboard');
+    if (adminPanel) {
+        adminPanel.classList.add('active');
+        adminPanel.style.display = 'block';
+    }
+    
+    // Cập nhật thanh danh mục trên cùng hiển thị quyền Manager
+    updateTopBarMenu(userData.fullName, "MANAGER"); // ✏️ Đổi chữ "ADMIN" thành "MANAGER" ở đây
 
-    // Bổ sung code: Đổ dữ liệu vào DOM sau khi đăng nhập thành công
-    document.getElementById('profile-field-name').value = "Nguyễn Ngọc Gia Vy";
-    document.getElementById('profile-field-phone').value = "0348340006";
-    document.getElementById('profile-field-email').value = "nguyenngocgiavy1812@gmail.com";
-    document.getElementById('profile-field-birth').value = "18/12/2006";
-    document.getElementById('profile-field-gender').value = "Nữ";
+            } else if (userRole === 2) {
+                // --- 📋 VAI TRÒ 2: NHÂN VIÊN (STAFF) ---
+                alert(`[NHÂN VIÊN RẠP] Xác thực thành công! Xin chào: ${userData.fullName}.`);
+                
+                const staffPanel = document.getElementById('panel-staff-dashboard');
+                if (staffPanel) {
+                    staffPanel.classList.add('active');
+                    staffPanel.style.display = 'block'; // Hiển thị phân vùng nghiệp vụ nhân viên
+                }
+                
+                updateTopBarMenu(userData.fullName, "NHÂN VIÊN");
 
-    const authLinkBox = document.getElementById('top-bar-auth-link');
-    authLinkBox.removeAttribute('onclick');
-    authLinkBox.innerHTML = `
-        <span class="sub-nav-icon">👤</span> XIN CHÀO, GIA VY! 
-        <span onclick="handleCgvLogout(event)" style="color: #0066cc; margin-left: 8px; cursor: pointer; text-decoration: underline; font-weight: bold;">THOÁT</span>
-    `;
-    document.getElementById('top-bar-ticket-link').innerHTML = `<span class="sub-nav-icon">🎬</span> LỊCH SỬ GIAO DỊCH`;
-    switchCgvTab('panel-profile');
+            } else if (userRole === 3) {
+                // --- 👤 VAI TRÒ 3: HỘI VIÊN / KHÁCH HÀNG (CUSTOMER) ---
+                alert(`Chào mừng Hội viên LAS Cinemas: ${userData.fullName} đã quay trở lại!`);
+                
+                // Đổ dữ liệu thật từ SQL Server lên các trường thông tin trong trang cá nhân
+                if (document.getElementById('profile-field-name'))  document.getElementById('profile-field-name').value = userData.fullName;
+                if (document.getElementById('profile-field-phone')) document.getElementById('profile-field-phone').value = userData.phoneNumber || "";
+                if (document.getElementById('profile-field-email')) document.getElementById('profile-field-email').value = userData.email;
+                if (document.getElementById('profile-field-birth')) document.getElementById('profile-field-birth').value = userData.birthDate || "";
+                
+                const profilePanel = document.getElementById('panel-profile');
+                if (profilePanel) {
+                    profilePanel.classList.add('active');
+                    profilePanel.style.display = 'block'; // Hiển thị trang quản lý tài khoản khách hàng
+                }
+                
+                updateTopBarMenu(userData.fullName, "MEMBER");
+                
+                // (Tùy chọn) Chuyển hướng tab nội dung sang trang cá nhân hội viên
+                if (typeof switchCgvTab === "function") {
+                    switchCgvTab('panel-profile');
+                }
+            }
+
+        } else {
+            // Trường hợp Backend báo sai mật khẩu, sai tài khoản, hoặc tài khoản chưa kích hoạt
+            alert("ĐĂNG NHẬP THẤT BẠI: " + response.message);
+            generateNewLoginCaptcha(); // Đổi mã Captcha mới
+            document.getElementById('login-captcha').value = ""; // Reset ô nhập mã
+        }
+    })
+    .catch(err => {
+        console.error("Lỗi đăng nhập:", err);
+        alert("Sự cố hệ thống: Không thể kết nối đến Server Spring Boot!");
+    });
 }
 
-    function submitCgvRegister() {
-        const name = document.getElementById('reg-name').value.trim();
-        const phone = document.getElementById('reg-phone').value.trim();
-        const email = document.getElementById('reg-email').value.trim();
-        const password = document.getElementById('reg-password').value;
-        const captchaInput = document.getElementById('reg-captcha').value.trim();
-        const currentRegCaptcha = document.getElementById('reg-captcha-text').innerText;
-        
-        if (!name || !phone || !email || !password) return alert("Vui lòng điền đầy đủ thông tin!");
-        if (captchaInput.toUpperCase() !== currentRegCaptcha.toUpperCase()) return alert("Mã xác thực Captcha đăng ký không khớp!");
-        
-        closeAuthModal(); openOtpModal();
+let registeredEmailCache = "";
+  function submitCgvRegister(event) {
+    if (event) {
+        event.preventDefault();
     }
 
-    function switchMovieFilterTab(filter) {
-        const mainTitle = document.getElementById('tab-title-now');
-        const subTitle = document.getElementById('tab-title-coming');
-        currentMovieFilter = filter;
-        if(filter === 'now_showing') {
-            if(mainTitle) mainTitle.className = "tab-title-main";
-            if(subTitle) subTitle.className = "tab-title-sub";
-            document.getElementById('bc-current-text').innerText = "Phim Đang Chiếu";
+    const name = document.getElementById('reg-name').value.trim();
+    const phone = document.getElementById('reg-phone').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const captchaInput = document.getElementById('reg-captcha').value.trim();
+    const currentRegCaptcha = document.getElementById('reg-captcha-text').innerText;
+    
+    if (!name || !phone || !email || !password) return alert("Vui lòng điền đầy đủ thông tin!");
+    if (captchaInput.toUpperCase() !== currentRegCaptcha.toUpperCase()) return alert("Mã xác thực Captcha không khớp!");
+    
+    const birthDay = document.getElementById('reg-birth-day').value;
+    const birthMonth = document.getElementById('reg-birth-month').value;
+    const birthYear = document.getElementById('reg-birth-year').value;
+
+    if (!birthDay || !birthMonth || !birthYear) return alert("Vui lòng chọn đầy đủ ngày tháng năm sinh!");
+
+    const genderActive = document.querySelector('input[name="gender"]:checked');
+    const genderValue = genderActive ? genderActive.value : "Nam";
+
+    const payload = {
+        name: name,
+        phone: phone,
+        email: email,
+        password: password,
+        birthDay: parseInt(birthDay),
+        birthMonth: parseInt(birthMonth),
+        birthYear: parseInt(birthYear),
+        gender: genderValue
+    };
+
+    fetch('http://localhost:8080/api/register/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(res => {
+        if (!res.ok && res.status !== 400) throw new Error("Server phản hồi lỗi!");
+        return res.json();
+    })
+    .then(response => {
+        if (response.status === 'success') {
+            alert(response.message);
+            
+            // 🚀 Lưu lại email vào biến tạm để lát nữa verify OTP
+            registeredEmailCache = response.email; 
+            
+            closeAuthModal(); 
+            
+            // Bật Modal OTP của bạn lên
+            const otpModal = document.getElementById('otp-modal');
+            if (otpModal) {
+                otpModal.classList.add('open');
+            }
         } else {
-            if(mainTitle) mainTitle.className = "tab-title-sub";
-            if(subTitle) subTitle.className = "tab-title-main";
-            document.getElementById('bc-current-text').innerText = "Phim Sắp Chiếu";
+            alert(response.message); 
         }
-        renderCgvInterface();
+    })
+    .catch(err => {
+        console.error("Lỗi kết nối:", err);
+        alert("Không thể kết nối đến Server Backend!");
+    });
+}
+function updateTopBarMenu(fullName, roleName) {
+    const authLinkBox = document.getElementById('top-bar-auth-link');
+    if (authLinkBox) {
+        authLinkBox.removeAttribute('onclick');
+        authLinkBox.innerHTML = `
+            <span class="sub-nav-icon">👤</span> [${roleName}] ${fullName.toUpperCase()}! 
+            <span onclick="confirmLogoutAction(event)" style="color: #e71a0f; margin-left: 8px; cursor: pointer; text-decoration: underline; font-weight: bold;">[THOÁT]</span>
+        `;
     }
+}
+
+// Hàm xử lý nút Thoát phiên làm việc sạch bộ nhớ
+function confirmLogoutAction(e) {
+    if(e) e.stopPropagation();
+    if(confirm("Bạn có chắc chắn muốn đăng xuất phiên làm việc này không?")) {
+        sessionStorage.clear(); // Xóa sạch dấu vết roleId trong session
+        isUserLoggedInState = false;
+        location.reload(); // Reload lại trang để đưa giao diện về mặc định ban đầu
+    }
+}
+function submitOtpVerification() {
+    const otpInput = document.getElementById('otp-input-field').value.trim();
+
+    if (!otpInput) {
+        return alert("Vui lòng nhập mã số OTP gồm 6 chữ số!");
+    }
+
+    if (!registeredEmailCache) {
+        return alert("Không tìm thấy thông tin email đăng ký hợp lệ. Vui lòng thử lại!");
+    }
+
+    // Gửi mã OTP và Email lên Spring Boot để đối chiếu
+    fetch('http://localhost:8080/api/register/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            email: registeredEmailCache,
+            otp: otpInput
+        })
+    })
+    .then(res => {
+        if (!res.ok && res.status !== 401 && res.status !== 400) throw new Error("Lỗi hệ thống!");
+        return res.json();
+    })
+    .then(response => {
+        if (response.status === 'success') {
+            alert(response.message); // Hiện thông báo "Kích hoạt tài khoản thành công!"
+            
+            // Đóng khung OTP lại
+            document.getElementById('otp-modal').classList.remove('open');
+            
+            // Tự động mở lại bảng Đăng nhập để người dùng nhập tài khoản vừa tạo
+            openAuthModal();
+            toggleAuthTab('login');
+            
+            // Điền sẵn email vừa đăng ký xong vào ô đăng nhập cho tiện luôn
+            document.getElementById('auth-username').value = registeredEmailCache;
+            document.getElementById('otp-input-field').value = ""; // Xóa trắng ô nhập OTP
+        } else {
+            // Hiện thông báo mã OTP không chính xác
+            alert(response.message);
+        }
+    })
+    .catch(err => {
+        console.error("Lỗi xác thực:", err);
+        alert("Sự cố đường truyền, không thể kiểm tra mã OTP!");
+    });
+}
 
     function quickBookMovie(movieTitle) {
         switchCgvTab('panel-booking');
